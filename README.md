@@ -1,7 +1,8 @@
 # 🧾 Catatan Pengembangan Fitur QC Vendor Gibson
 
 ## 📝 File yang Diedit
-- system/libraries/Session.php  
+- system/libraries/Session.php
+- application/views/wall.php 
 
 ## 🆕 File yang Ditambahkan
 - application/controllers/ag/QcGibson.php  
