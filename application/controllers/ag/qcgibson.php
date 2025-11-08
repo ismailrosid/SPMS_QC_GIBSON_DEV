@@ -120,6 +120,7 @@ class QcGibson extends Controller
         if (!empty($isPending)) {
             echo json_encode(array('status' => 'error', 'message' => 'This serial number has not completed the Assembly-II process.', 'errors' => array()));
             exit();
+            // update message update
         }
 
         $aData = array(
