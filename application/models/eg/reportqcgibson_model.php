@@ -1,7 +1,6 @@
 <?php
 class reportQcGibson_model extends Model
 {
-
     function reportQcGibson_model()
     {
         parent::Model();
@@ -44,9 +43,8 @@ class reportQcGibson_model extends Model
             COUNT(ttp.d_process_7) AS n_process_7,
             COUNT(ttp.d_process_8) AS n_process_8,
             COUNT(ttp.d_process_9) AS n_process_9,
-            COUNT(ttp.d_process_gibson) AS n_process_gibson,  -- New Gibson Checking process
+            COUNT(ttp.d_process_gibson) AS n_process_gibson,  -- Gibson Checking process
             COUNT(ttp.d_process_10) AS n_process_10,
-            
             COUNT(ttp.d_process_14) AS n_process_14,
 
             (
@@ -55,7 +53,7 @@ class reportQcGibson_model extends Model
                 COUNT(ttp.d_process_9) + COUNT(ttp.d_process_gibson) + COUNT(ttp.d_process_10) + COUNT(ttp.d_process_14)
             ) AS n_qty
 
-        FROM tv_production_date_ag_spesific_gibson AS ttp
+        FROM tv_production_date_eg_spesific_gibson AS ttp
         $sCriteria
         GROUP BY
             ttp.s_model,
@@ -126,7 +124,7 @@ class reportQcGibson_model extends Model
                 COUNT(ttp.d_process_9) + COUNT(ttp.d_process_gibson) + COUNT(ttp.d_process_10) + COUNT(ttp.d_process_14)
             ) AS n_qty
 
-        FROM tv_production_date_ag_spesific_gibson AS ttp
+        FROM tv_production_date_eg_spesific_gibson AS ttp
         $sCriteria
         GROUP BY
             ttp.s_color,

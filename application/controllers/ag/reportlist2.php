@@ -240,7 +240,6 @@ class Reportlist2 extends Controller {
 		$aTotalData['n_t_process_7']=$n_t_process_7;
 		$aTotalData['n_t_process_8']=$n_t_process_8;
 		$aTotalData['n_t_process_9']=$n_t_process_9;
-
 		$aTotalData['n_t_process_10']=$n_t_process_10;
 		$aTotalData['n_t_process_14']=$n_t_process_14;
 		$aTotalDatas[]=$aTotalData;
@@ -315,7 +314,7 @@ class Reportlist2 extends Controller {
 		$aHeader = array(
 			'd_production_date' => 'Month',
 			'd_plan_date' => 'Production Plan Date (Input)',
-			'd_delivery_date' => 'Production Plan Date (Output)',g
+			'd_delivery_date' => 'Production Plan Date (Output)',
 			'd_target_date' => 'Export Plan Date',
 			's_buyer_name' => 'Buyer',
 			's_po_no' => 'PI Number',

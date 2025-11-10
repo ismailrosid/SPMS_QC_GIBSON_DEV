@@ -42,7 +42,7 @@
     border: 2px dashed #d9d9d9;
     border-radius: 8px;
     background: #f9f9f9;
-    min-height: 150px;
+    min-height: 80px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -51,12 +51,14 @@
     cursor: text;
     text-align: center;
     padding: 10px;
-    transition: border 0.2s, background 0.2s;
+    transition: all 0.25s ease-in-out;
   }
 
-  .scan-container:focus-within {
-    border-color: #999;
-    background: #fff;
+  /* Saat fokus atau aktif */
+  .scan-container.active,
+  .scan-container:focus {
+    border: 2px solid #acd1f8ff !important;
+    background: #eef6ff;
     outline: none;
   }
 
@@ -92,7 +94,6 @@
     cursor: not-allowed;
   }
 
-  /* Spinner for loading */
   .spinner {
     display: inline-block;
     width: 16px;
@@ -206,12 +207,10 @@
     background: transparent;
   }
 </style>
-
+<!--  -->
 <div class="card-form">
   <div class="card-form-section">
     <div class="card-form-section-body">
-
-      <!-- ERROR CARD -->
       <div class="error-card" id="errorCard">
         <div class="error-header">
           <div class="error-header-left">
@@ -226,28 +225,24 @@
           <div class="error-container" id="genericErrorList"></div>
         </div>
       </div>
-
-      <!-- FORM -->
+      <!--  -->
       <form id="directForm">
-        <label>
-          <span class="required-star">*</span> Serial Number
-        </label>
-
+        <label><span class="required-star">*</span> Serial Number</label>
+        <!-- klik langsung fokus -->
         <div class="scan-container" id="scanContainer" tabindex="0">
           Scan or type serial number here
         </div>
-
+        <!--  -->
         <input type="text" id="serial_no" name="serial_no" required />
-
+        <!--  -->
         <div class="btn-group">
           <button type="submit" id="submitBtn" disabled>Submit</button>
         </div>
       </form>
-
     </div>
   </div>
 </div>
-
+<!--  -->
 <script>
   const form = document.getElementById("directForm");
   const serialInput = document.getElementById("serial_no");
@@ -257,12 +252,28 @@
   const closeBtn = document.querySelector(".close-btn");
   const scanContainer = document.getElementById("scanContainer");
 
-  scanContainer.addEventListener("click", () => scanContainer.focus());
+  // === Klik langsung aktif dan fokus ===
+  scanContainer.addEventListener("click", () => {
+    scanContainer.classList.add("active");
+    scanContainer.focus();
+  });
+
+  // === Hilangkan efek aktif saat blur kalau kosong ===
+  scanContainer.addEventListener("blur", () => {
+    if (!serialInput.value.trim()) {
+      scanContainer.classList.remove("active");
+    }
+  });
+
   scanContainer.addEventListener("keydown", (e) => {
     if (e.key === "Backspace") serialInput.value = serialInput.value.slice(0, -1);
     else if (e.key.length === 1) serialInput.value += e.key.toUpperCase();
-    scanContainer.textContent = serialInput.value.toUpperCase() || "Scan or type serial number here";
+
+    scanContainer.textContent =
+      serialInput.value.toUpperCase() || "Scan or type serial number here";
     submitBtn.disabled = !serialInput.value.trim();
+
+    if (serialInput.value.trim()) scanContainer.classList.add("active");
   });
 
   form.addEventListener("submit", async (e) => {
@@ -270,7 +281,6 @@
     const serialNo = serialInput.value.trim();
     if (!serialNo) return;
 
-    // --- Loading state ---
     submitBtn.disabled = true;
     const originalText = submitBtn.innerHTML;
     submitBtn.innerHTML = `<span class="spinner"></span> Processing...`;
@@ -278,14 +288,11 @@
     try {
       const data = new FormData();
       data.append("serial_no", serialNo);
-      const url = "<?= site_url('ag/qcgibson/doupload'); ?>";
       const response = await fetch("<?= site_url('ag/qcgibson/savedirect'); ?>", {
         method: "POST",
-        body: data
+        body: data,
       });
-
       const result = await response.json();
-
       if (result.status === "success") showCard(result.message, "success");
       else showCard(result.message, "error");
     } catch {
@@ -307,12 +314,26 @@
     if (type === "success") {
       serialInput.value = "";
       scanContainer.textContent = "Scan or type serial number here";
+      scanContainer.classList.remove("active");
       submitBtn.disabled = true;
     }
   }
 
   closeBtn.addEventListener("click", () => {
     errorCard.classList.remove("show");
-    setTimeout(() => errorCard.style.display = "none", 400);
+    setTimeout(() => (errorCard.style.display = "none"), 400);
+  });
+
+  scanContainer.addEventListener("paste", (e) => {
+    e.preventDefault();
+    const pasteText =
+      (e.clipboardData || window.clipboardData).getData("text").trim();
+    if (pasteText) {
+      serialInput.value = pasteText.toUpperCase();
+      scanContainer.textContent = serialInput.value;
+      submitBtn.disabled = false;
+      scanContainer.classList.add("active");
+    }
   });
 </script>
+<!--  -->

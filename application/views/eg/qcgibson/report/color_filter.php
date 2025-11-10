@@ -66,6 +66,6 @@
 		<a href="javascript:_doPost(null, null, null, 'frmSearch', '<?=$siteurl?>')" rel="btnFilterReportModel" title="Search/Filter Model Report"><img src="<?=$baseurl?>images/ribbon/find32.png"/>Search</a>
 	</div>
 	<div class="button">
-		<a href="javascript:_doPost(null, null, null, 'frmSearch', '<?=$basesiteurl?>/ag/qcgibsonreport/groupexcel/<?=$sViewReport?>')" rel="btnExcelReportModel" title="Export Model Report to Excel"><img src="<?=$baseurl?>images/ribbon/excel32.png"/>Excel</a>
+		<a href="javascript:_doPost(null, null, null, 'frmSearch', '<?=$basesiteurl?>/ag/reportlist/groupexcel/<?=$sViewReport?>')" rel="btnExcelReportModel" title="Export Model Report to Excel"><img src="<?=$baseurl?>images/ribbon/excel32.png"/>Excel</a>
 	</div>
 </form>
