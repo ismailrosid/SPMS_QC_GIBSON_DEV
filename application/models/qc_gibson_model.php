@@ -1,48 +1,43 @@
 <?php
 class Qc_gibson_model extends Model {
 
+    // Constructor
     function Qc_gibson_model() {
         parent::Model();
     }
 
     /**
-     * Cek apakah serial number sudah ada di tabel tt_checker_gibson
+     * Check if a serial number already exists in the tt_checker_gibson table
      */
     function is_exists($sSerialNo) {
         $this->db->where('serial_no', strtoupper(trim($sSerialNo)));
         $query = $this->db->get('tt_checker_gibson');
-        if ($query->num_rows() > 0) {
-            return TRUE;
-        }
-        return FALSE;
+        return $query->num_rows() > 0;
     }
 
     /**
-     * Insert data baru
+     * Insert new data into tt_checker_gibson
      */
     function insert_data($aData) {
         foreach ($aData as $sField => $sValue) {
             if ($sValue == '') {
-                $this->db->set($sField, 'NULL', FALSE);
+                $this->db->set($sField, 'NULL', FALSE); // Set NULL if value is empty
             } else {
                 $this->db->set($sField, $sValue);
             }
         }
 
-        // uploaded_by dari session/user input
+        // Set uploaded_by if provided
         if (isset($aData['uploaded_by'])) {
             $this->db->set('uploaded_by', $aData['uploaded_by']);
         }
 
         $rInsert = $this->db->insert('tt_checker_gibson');
-        if ($rInsert === FALSE) {
-            return FALSE;
-        }
-        return TRUE;
+        return $rInsert !== FALSE;
     }
 
     /**
-     * Update data existing
+     * Update existing data for a specific serial number
      */
     function update_data($sSerialNo, $aData) {
         foreach ($aData as $sField => $sValue) {
@@ -53,7 +48,10 @@ class Qc_gibson_model extends Model {
             }
         }
 
+        // Update timestamp
         $this->db->set('uploaded_at', 'NOW()', FALSE);
+
+        // Update uploaded_by if provided
         if (isset($aData['uploaded_by'])) {
             $this->db->set('uploaded_by', $aData['uploaded_by']);
         }
@@ -61,59 +59,39 @@ class Qc_gibson_model extends Model {
         $this->db->where('serial_no', strtoupper(trim($sSerialNo)));
         $rUpdate = $this->db->update('tt_checker_gibson');
 
-        if ($rUpdate === FALSE) {
-            return FALSE;
+        return $rUpdate !== FALSE;
+    }
+
+    /**
+     * Retrieve all Gibson serial numbers from a given list
+     */
+    function get_serials_gibson($serials) {
+        if (empty($serials)) return array();
+
+        // Get all Gibson buyer codes
+        $buyerQuery = $this->db->select('s_code')
+                               ->from('tv_customer_gibson')
+                               ->get();
+        $buyers = array();
+        foreach ($buyerQuery->result_array() as $row) {
+            $buyers[] = $row['s_code'];
         }
-        return TRUE;
+
+        if (empty($buyers)) return array(); // No Gibson buyers found
+
+        // Get matching serial numbers from tt_production
+        $this->db->select('s_serial_no')
+                 ->from('tt_production')
+                 ->where_in('s_serial_no', $serials)
+                 ->where_in('s_buyer', $buyers);
+
+        $query = $this->db->get();
+        $result = array();
+        foreach ($query->result_array() as $row) {
+            $result[] = $row['s_serial_no'];
+        }
+
+        return $result;
     }
-
-/**
- * Ambil semua serial Gibson sekaligus
- */
-function get_serials_gibson($serials) {
-    if (empty($serials)) return array();
-
-    // Ambil semua kode buyer Gibson dulu
-    $buyerQuery = $this->db->select('s_code')
-                           ->from('tv_customer_gibson')
-                           ->get();
-    $buyers = array();
-    foreach ($buyerQuery->result_array() as $row) {
-        $buyers[] = $row['s_code'];
-    }
-
-    if (empty($buyers)) return array(); // Tidak ada buyer Gibson
-
-    $this->db->select('s_serial_no')
-             ->from('tt_production')
-             ->where_in('s_serial_no', $serials)
-             ->where_in('s_buyer', $buyers);
-
-    $query = $this->db->get();
-    $result = array();
-    foreach ($query->result_array() as $row) {
-        $result[] = $row['s_serial_no'];
-    }
-    return $result;
-}
-
-/**
- * Ambil serial yang masih pending assembly II
- */
-function get_pending_assembly_ii($serials) {
-    if (empty($serials)) return array();
-
-    $this->db->select('s_serial_no')
-             ->from('tv_production_pending_process_9')
-             ->where_in('s_serial_no', $serials);
-
-    $query = $this->db->get();
-    $result = array();
-    foreach ($query->result_array() as $row) {
-        $result[] = $row['s_serial_no'];
-    }
-    return $result;
-}
-
 }
 ?>

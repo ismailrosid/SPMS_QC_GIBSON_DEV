@@ -42,11 +42,11 @@
     border: 2px dashed #d9d9d9;
     border-radius: 8px;
     background: #f9f9f9;
-    min-height: 80px;
+    min-height: 30px;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 26px;
+    font-size: 20px;
     color: #555;
     cursor: text;
     text-align: center;
@@ -54,7 +54,6 @@
     transition: all 0.25s ease-in-out;
   }
 
-  /* Saat fokus atau aktif */
   .scan-container.active,
   .scan-container:focus {
     border: 2px solid #acd1f8ff !important;
@@ -66,7 +65,6 @@
     display: none;
   }
 
-  /* === SUBMIT BUTTON === */
   .btn-group {
     margin-top: 20px;
     text-align: right;
@@ -112,7 +110,6 @@
     }
   }
 
-  /* === ERROR CARD === */
   .error-card {
     position: relative;
     background: #fff;
@@ -207,7 +204,7 @@
     background: transparent;
   }
 </style>
-<!--  -->
+
 <div class="card-form">
   <div class="card-form-section">
     <div class="card-form-section-body">
@@ -225,16 +222,13 @@
           <div class="error-container" id="genericErrorList"></div>
         </div>
       </div>
-      <!--  -->
+
       <form id="directForm">
         <label><span class="required-star">*</span> Serial Number</label>
-        <!-- klik langsung fokus -->
         <div class="scan-container" id="scanContainer" tabindex="0">
           Scan or type serial number here
         </div>
-        <!--  -->
         <input type="text" id="serial_no" name="serial_no" required />
-        <!--  -->
         <div class="btn-group">
           <button type="submit" id="submitBtn" disabled>Submit</button>
         </div>
@@ -242,7 +236,7 @@
     </div>
   </div>
 </div>
-<!--  -->
+
 <script>
   const form = document.getElementById("directForm");
   const serialInput = document.getElementById("serial_no");
@@ -251,31 +245,47 @@
   const errorListDiv = document.getElementById("genericErrorList");
   const closeBtn = document.querySelector(".close-btn");
   const scanContainer = document.getElementById("scanContainer");
+  submitBtn.disabled = true;
+  // === Enable or disable submit button based on input ===
+  function updateSubmitState() {
+    submitBtn.disabled = !serialInput.value.trim();
+  }
 
-  // === Klik langsung aktif dan fokus ===
+  // === Focus scan container on click ===
   scanContainer.addEventListener("click", () => {
     scanContainer.classList.add("active");
     scanContainer.focus();
   });
 
-  // === Hilangkan efek aktif saat blur kalau kosong ===
+  // === Remove active style if input is empty on blur ===
   scanContainer.addEventListener("blur", () => {
-    if (!serialInput.value.trim()) {
-      scanContainer.classList.remove("active");
-    }
+    if (!serialInput.value.trim()) scanContainer.classList.remove("active");
   });
 
+  // === Keyboard input handling ===
   scanContainer.addEventListener("keydown", (e) => {
     if (e.key === "Backspace") serialInput.value = serialInput.value.slice(0, -1);
     else if (e.key.length === 1) serialInput.value += e.key.toUpperCase();
 
     scanContainer.textContent =
       serialInput.value.toUpperCase() || "Scan or type serial number here";
-    submitBtn.disabled = !serialInput.value.trim();
-
     if (serialInput.value.trim()) scanContainer.classList.add("active");
+    updateSubmitState();
   });
 
+  // === Handle paste event ===
+  scanContainer.addEventListener("paste", (e) => {
+    e.preventDefault();
+    const pasteText = (e.clipboardData || window.clipboardData).getData("text").trim();
+    if (pasteText) {
+      serialInput.value = pasteText.toUpperCase();
+      scanContainer.textContent = serialInput.value;
+      scanContainer.classList.add("active");
+    }
+    updateSubmitState();
+  });
+
+  // === Form submission ===
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const serialNo = serialInput.value.trim();
@@ -299,15 +309,17 @@
       showCard("Failed to connect to server.", "error");
     } finally {
       submitBtn.innerHTML = originalText;
-      submitBtn.disabled = !serialInput.value.trim();
+      updateSubmitState();
     }
   });
 
+  // === Display message card ===
   function showCard(message, type) {
     const errorTitle = document.getElementById("errorTitle");
     errorTitle.textContent = type === "success" ? "Success!" : "Error!";
     errorTitle.style.color = type === "success" ? "green" : "red";
-    errorListDiv.innerHTML = `<p>${message}</p>`;
+    const textColor = type === "success" ? "green" : "red";
+    errorListDiv.innerHTML = `<p style="color:${textColor};">${message}</p>`;
     errorCard.style.display = "block";
     setTimeout(() => errorCard.classList.add("show"), 10);
 
@@ -319,21 +331,9 @@
     }
   }
 
+  // === Close card ===
   closeBtn.addEventListener("click", () => {
     errorCard.classList.remove("show");
     setTimeout(() => (errorCard.style.display = "none"), 400);
   });
-
-  scanContainer.addEventListener("paste", (e) => {
-    e.preventDefault();
-    const pasteText =
-      (e.clipboardData || window.clipboardData).getData("text").trim();
-    if (pasteText) {
-      serialInput.value = pasteText.toUpperCase();
-      scanContainer.textContent = serialInput.value;
-      submitBtn.disabled = false;
-      scanContainer.classList.add("active");
-    }
-  });
 </script>
-<!--  -->

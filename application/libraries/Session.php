@@ -136,7 +136,6 @@ class CI_Session {
 				$this->sess_create();
 				$this->set_userdata('s_username', $row->s_username);
 				$this->set_userdata('s_level', $row->s_level);
-			    $this->set_userdata('b_checker_gibson', ($row->b_checker_gibson == 't' ? true : false));
 
 				$this->CI->db->where('s_level', $row->s_level);
 				$query = $this->CI->db->get($this->user_level_table);
@@ -163,8 +162,8 @@ class CI_Session {
 					$this->set_userdata('b_ag_sales_batch', ($row->b_ag_sales_batch=='t' ? true : false));
 					$this->set_userdata('b_eg_sales_batch', ($row->b_eg_sales_batch=='t' ? true : false));
 					$this->set_userdata('b_replace_production', ($row->b_replace_production=='t' ? true : false));
-				    $this->set_userdata('b_ag_cheker_gibson', ($row->b_ag_cheker_gibson=='t' ? true : false));
-				    $this->set_userdata('b_eg_cheker_gibson', ($row->b_eg_cheker_gibson=='t' ? true : false));
+				    $this->set_userdata('b_ag_checker_gibson', ($row->b_ag_checker_gibson=='t' ? true : false));
+				    $this->set_userdata('b_eg_checker_gibson', ($row->b_eg_checker_gibson=='t' ? true : false));
 					$bLoginSuccess = true;
 				} else {
 					$bLoginSuccess = false;

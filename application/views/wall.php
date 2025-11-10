@@ -144,68 +144,56 @@
 				</ul>
 			</td>
 		<?php	} ?>
-		<!-- Code update QC Gibson -->
-		<?php if ($this->session->userdata('b_ag_cheker_gibson') && $this->session->userdata('b_checker_gibson')) { ?>
+
+		<!-- QC Gibson Menu Update 2025 -->
+		<?php if ($this->session->userdata('b_ag_checker_gibson')) { ?>
 			<td width="250px" valign="top" style="border-left:1px solid #76ACE2;">
 				<font class="content_title">Acoustic Guitar (QC Gibson)</font>
 				<ul class="list_menu">
 					<li>
-						<a href="{basesiteurl}/ag/qcgibson/scan">Form upload cheker gibson</a><br>
-						Melakukan upload serial number item Acoustic Guitar untuk verifikasi QC Gibson (Pass / Not Pass)
+						<a href="{basesiteurl}/ag/qcgibson/scan">Gibson Checker Upload Form</a><br>
+						Upload the serial numbers of Acoustic Guitar items for QC Gibson verification (Pass / Not Pass)
 					</li>
 					<li>
-						<a href="{basesiteurl}/ag/qcgibson/direct">Form Direct Scan Serial Gibson</a><br>
-						Form scan serial Gibson dan pemeriksaan QC
+						<a href="{basesiteurl}/ag/qcgibson/direct">Direct Serial Scan Form (Gibson)</a><br>
+						Scan Gibson serial numbers and perform QC inspection
 					</li>
-					<li><a href="{basesiteurl}/ag/qcgibsonreport/group/model">Model</a><br>
-						Electric Guitar Group By Model
+					<li>
+						<a href="{basesiteurl}/ag/qcgibsonreport/group/model">Model Report</a><br>
+						Acoustic Guitar QC Gibson - Grouped by Model
 					</li>
-					<li><a href="{basesiteurl}/ag/qcgibsonreport/group/color">Color</a><br>
-						Electric Guitar Group By Color
+					<li>
+						<a href="{basesiteurl}/ag/qcgibsonreport/group/color">Color Report</a><br>
+						Acoustic Guitar QC Gibson - Grouped by Color
 					</li>
-					<li><a href="{basesiteurl}/ag/qcgibsonreport/serialdatephase">Serial No, Date &amp; Phase</a><br>
-						Electric Guitar Serial No, Date &amp; Phase (Last Process Production)
-					</li>
-					<!-- <li><a href="{basesiteurl}/ag/qcgibsonreport/serialdatephase">Serial No, Date &amp; Phase</a><br>
-						Electric Guitar Serial No, Date &amp; Phase (Process Production)
-					</li> -->
-					<!-- <li><a href="{basesiteurl}/ag/qcgibsonreport/serialdate">Serial No &amp; Date</a><br>
-						Electric Guitar Serial No &amp; Date
-					</li> -->
 				</ul>
 			</td>
 		<?php } ?>
-		<!--  -->
-		<?php if ($this->session->userdata('b_eg_cheker_gibson') && $this->session->userdata('b_checker_gibson')) { ?>
+
+		<?php if ($this->session->userdata('b_eg_checker_gibson')) { ?>
 			<td width="250px" valign="top" style="border-left:1px solid #76ACE2;">
 				<font class="content_title">Electric Guitar (QC Gibson)</font>
 				<ul class="list_menu">
 					<li>
-						<a href="{basesiteurl}/eg/qcgibson/scan">Form upload checker Gibson</a><br>
-						Melakukan upload serial number item Electric Guitar untuk verifikasi QC Gibson (Pass / Not Pass)
+						<a href="{basesiteurl}/eg/qcgibson/scan">Gibson Checker Upload Form</a><br>
+						Upload the serial numbers of Electric Guitar items for QC Gibson verification (Pass / Not Pass)
 					</li>
 					<li>
-						<a href="{basesiteurl}/eg/qcgibson/direct">Form Direct Scan Serial Gibson</a><br>
-						Form scan serial Gibson dan pemeriksaan QC untuk Electric Guitar
+						<a href="{basesiteurl}/eg/qcgibson/direct">Direct Serial Scan Form (Gibson)</a><br>
+						Scan Gibson serial numbers and perform QC inspection for Electric Guitar
 					</li>
-					<li><a href="{basesiteurl}/eg/qcgibsonreport/group/model">Model</a><br>
-						Electric Guitar Group By Model
+					<li>
+						<a href="{basesiteurl}/eg/qcgibsonreport/group/model">Model Report</a><br>
+						Electric Guitar QC Gibson - Grouped by Model
 					</li>
-					<li><a href="{basesiteurl}/eg/qcgibsonreport/group/color">Color</a><br>
-						Electric Guitar Group By Color
+					<li>
+						<a href="{basesiteurl}/eg/qcgibsonreport/group/color">Color Report</a><br>
+						Electric Guitar QC Gibson - Grouped by Color
 					</li>
-					<li><a href="{basesiteurl}/eg/reportlist/serialdatephase">Serial No, Date &amp; Phase</a><br>
-						Electric Guitar Serial No, Date &amp; Phase (Last Process Production)
-					</li>
-					<!-- <li><a href="{basesiteurl}/eg/reportlist2/serialdatephase">Serial No, Date &amp; Phase</a><br>
-						Electric Guitar Serial No, Date &amp; Phase (Process Production)
-					</li> -->
-					<!-- <li><a href="{basesiteurl}/eg/reportlist2/serialdate">Serial No &amp; Date</a><br>
-						Electric Guitar Serial No &amp; Date
-					</li> -->
 				</ul>
 			</td>
 		<?php } ?>
-		<!-- END update QC Gibson -->
+		<!-- END QC Gibson Menu Update 2025 -->
+
 	</tr>
 </table>

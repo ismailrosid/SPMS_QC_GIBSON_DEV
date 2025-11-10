@@ -17,7 +17,7 @@ class QcGibson extends Controller
 
         $this->load->library('session');
 
-        if (!$this->session->userdata('b_ag_cheker_gibson')) {
+        if (!$this->session->userdata('b_ag_checker_gibson')) {
             show_error('Access Denied');
         }
 
@@ -94,35 +94,41 @@ class QcGibson extends Controller
     {
         header('Content-Type: application/json');
 
+        // Get input values from POST
         $serialNo  = trim($this->input->post('serial_no', true));
         $scanDate  = trim($this->input->post('date', true));
         $userScan  = trim($this->input->post('user_scan', true));
         $location  = trim($this->input->post('location', true));
         $judgment  = trim($this->input->post('judgment', true));
 
+        // Validate required field
         if (empty($serialNo)) {
-            echo json_encode(array('status' => 'error', 'message' => 'Serial number cannot be empty.', 'errors' => array()));
+            echo json_encode(array(
+                'status' => 'error',
+                'message' => 'Serial number cannot be empty.',
+                'errors' => array()
+            ));
             exit();
         }
 
+        // Set default values if empty
         if (empty($scanDate))  $scanDate  = date('Y-m-d H:i:s');
         if (empty($userScan))  $userScan  = $this->sUsername;
-        if (empty($location))  $location  = 'C';
+        if (empty($location))  $location  = NULL;
         if (empty($judgment))  $judgment  = 'good';
 
+        // Check if serial number exists in Gibson database
         $isGibson = $this->Qc_gibson_model->get_serials_gibson(array($serialNo));
         if (empty($isGibson)) {
-            echo json_encode(array('status' => 'error', 'message' => 'This serial number is not a Gibson product.', 'errors' => array()));
+            echo json_encode(array(
+                'status' => 'error',
+                'message' => 'This serial number is not a Gibson product.',
+                'errors' => array()
+            ));
             exit();
         }
 
-        $isPending = $this->Qc_gibson_model->get_pending_assembly_ii(array($serialNo));
-        if (!empty($isPending)) {
-            echo json_encode(array('status' => 'error', 'message' => 'This serial number has not completed the Assembly-II process.', 'errors' => array()));
-            exit();
-            // update message update
-        }
-
+        // Prepare data array for insert/update
         $aData = array(
             'serial_no'   => $serialNo,
             'date'        => $scanDate,
@@ -133,23 +139,37 @@ class QcGibson extends Controller
             'source'      => 'direct'
         );
 
+        // Start database transaction
         $this->db->trans_start();
 
+        // Insert or update based on existence
         if ($this->Qc_gibson_model->is_exists($serialNo)) {
             $rSave = $this->Qc_gibson_model->update_data($serialNo, $aData);
+            $action = 'updated';
         } else {
             $rSave = $this->Qc_gibson_model->insert_data($aData);
+            $action = 'saved';
         }
 
+        // Rollback if failed to save/update
         if (!$rSave) {
             $this->db->trans_rollback();
-            echo json_encode(array('status' => 'error', 'message' => 'Failed to save the serial number to the database.', 'errors' => array()));
+            echo json_encode(array(
+                'status' => 'error',
+                'message' => 'Failed to ' . $action . ' the serial number.',
+                'errors' => array()
+            ));
             exit();
         }
 
+        // Complete transaction
         $this->db->trans_complete();
 
-        echo json_encode(array('status' => 'success', 'message' => 'The serial number has been successfully saved!'));
+        // Return success response
+        echo json_encode(array(
+            'status' => 'success',
+            'message' => 'The serial number has been successfully ' . $action . '!'
+        ));
         exit();
     }
 
@@ -161,28 +181,33 @@ class QcGibson extends Controller
 
         $sElementName = 'f_file_name';
 
+        // Check if file was uploaded
         if (!isset($_FILES[$sElementName]['name']) || empty($_FILES[$sElementName]['name'])) {
             echo json_encode(array('status' => 'error', 'message' => 'No file was uploaded.', 'errors' => array()));
             exit();
         }
 
+        // Clean the uploaded file name to remove unwanted characters
         $sUploadedFileName = preg_replace("/[^a-zA-Z0-9_\-\.]/", "_", $_FILES[$sElementName]['name']);
         $sTmpPath = $_FILES[$sElementName]['tmp_name'];
 
-        // pastikan file .txt
+        // Only allow .txt files
         if (strtolower(pathinfo($sUploadedFileName, PATHINFO_EXTENSION)) != 'txt') {
             echo json_encode(array('status' => 'error', 'message' => 'Only .txt files are allowed.', 'errors' => array()));
             exit();
         }
 
+        // Ensure the upload directory exists
         $this->_forcePath($this->sUploadPath);
         $sDestPath = $this->sUploadPath . '/' . $sUploadedFileName;
 
+        // Move uploaded file to the designated upload folder
         if (!move_uploaded_file($sTmpPath, $sDestPath)) {
             echo json_encode(array('status' => 'error', 'message' => 'Failed to move the file to the upload folder.', 'errors' => array()));
             exit();
         }
 
+        // Read uploaded file line by line
         $lines = $this->_readfile($sUploadedFileName);
         $allSerials  = array();
         $dataToSave  = array();
@@ -192,6 +217,7 @@ class QcGibson extends Controller
             if ($line == '') continue;
 
             $parts = explode(';', $line);
+
             if (count($parts) < 5) {
                 echo json_encode(array('status' => 'error', 'message' => 'Invalid file format (missing columns).', 'errors' => array()));
                 exit();
@@ -201,7 +227,16 @@ class QcGibson extends Controller
             $scanDate = trim($parts[1]);
             $userScan = trim($parts[2]);
             $location = trim($parts[3]);
+
+            // Get judgment column from file, default to 'nogood' if empty/invalid
             $judgment = trim($parts[4]);
+            // convert judgment ke lowercase dan validasi
+            $judgmentLower = strtolower($judgment);
+            if ($judgmentLower != 'good' && $judgmentLower != 'nogood') {
+                $judgment = 'nogood';
+            } else {
+                $judgment = $judgmentLower;
+            }
 
             $allSerials[] = $serialNo;
             $dataToSave[$serialNo] = array(
@@ -215,30 +250,26 @@ class QcGibson extends Controller
             );
         }
 
-        $validSerials   = $this->Qc_gibson_model->get_serials_gibson($allSerials);
-        $pendingSerials = $this->Qc_gibson_model->get_pending_assembly_ii($allSerials);
+        // Get list of valid Gibson serial numbers from database
+        $validSerials = $this->Qc_gibson_model->get_serials_gibson($allSerials);
 
-        $notGibsonSerials = array();
-        $assyIIError      = array();
-        $serialErrors     = array();
-        $successSerials   = array();
+        $notGibsonSerials = array(); // serial numbers not valid for Gibson
+        $serialErrors = array();     // serials failed to insert/update
+
+        // Start a single transaction for all serials
+        $this->db->trans_start();
 
         foreach ($allSerials as $sn) {
 
-            // Skip invalid serial
+            // Skip invalid Gibson serial numbers
             if (!in_array($sn, $validSerials)) {
                 $notGibsonSerials[] = $sn;
                 continue;
             }
 
-            if (in_array($sn, $pendingSerials)) {
-                $assyIIError[] = $sn;
-                continue;
-            }
-
             $aData = $dataToSave[$sn];
-            $this->db->trans_start();
 
+            // Insert or update
             if ($this->Qc_gibson_model->is_exists($sn)) {
                 $rSave = $this->Qc_gibson_model->update_data($sn, $aData);
             } else {
@@ -246,29 +277,56 @@ class QcGibson extends Controller
             }
 
             if (!$rSave) {
-                $this->db->trans_rollback();
                 log_message('error', 'Failed to save serial: ' . $sn);
                 $serialErrors[] = $sn;
-            } else {
-                $this->db->trans_complete();
-                $successSerials[] = $sn;
             }
         }
 
-        $errorGroups = array();
-        if (!empty($notGibsonSerials)) $errorGroups[] = array('title' => 'Some serial numbers are not Gibson products', 'items' => $notGibsonSerials);
-        if (!empty($assyIIError)) $errorGroups[] = array('title' => 'Some serial numbers have not completed Assembly-II', 'items' => $assyIIError);
-        if (!empty($serialErrors)) $errorGroups[] = array('title' => 'Failed to save or update some serial numbers', 'items' => $serialErrors);
+        // If any serial failed to save, rollback all
+        if (!empty($serialErrors) || !empty($notGibsonSerials)) {
+            $this->db->trans_rollback(); // rollback everything
+            $errorGroups = array();
 
-        if (!empty($errorGroups)) {
-            $msg = !empty($successSerials) ? 'Some serials saved, some failed.' : 'All entries failed.';
-            echo json_encode(array('status' => 'error', 'message' => $msg, 'errors' => $errorGroups, 'success' => $successSerials));
+            // Message for serials that are not Gibson products
+            if (!empty($notGibsonSerials)) {
+                $title = count($notGibsonSerials) == 1 ?
+                    'The serial number is not a Gibson product' :
+                    'Some serial numbers are not Gibson products';
+                $errorGroups[] = array('title' => $title, 'items' => $notGibsonSerials);
+            }
+
+            // Message for failed insert/update
+            if (!empty($serialErrors)) {
+                $title = count($serialErrors) == 1 ?
+                    'Failed to save or update the serial number' :
+                    'Failed to save or update some serial numbers';
+                $errorGroups[] = array('title' => $title, 'items' => $serialErrors);
+            }
+
+
+            echo json_encode(array(
+                'status' => 'error',
+                'message' => 'No data has been saved due to errors.',
+                'errors' => $errorGroups,
+                'success' => array()
+            ));
         } else {
-            echo json_encode(array('status' => 'success', 'message' => 'All serial numbers have been successfully saved!', 'file_name' => $sUploadedFileName, 'success' => $successSerials));
+            // Commit transaction if all serials succeeded
+            $this->db->trans_complete();
+            $msg = count($allSerials) == 1 ?
+                'The serial number has been successfully saved/updated!' :
+                'All serial numbers have been successfully saved/updated!';
+            echo json_encode(array(
+                'status' => 'success',
+                'message' => $msg,
+                'file_name' => $sUploadedFileName,
+                'success' => $allSerials
+            ));
         }
 
         exit();
     }
+
 
     function _readfile($sFileName)
     {
