@@ -98,7 +98,7 @@ class QcGibson extends Controller
         $this->db->trans_start();
 
         // Check if defect code already exists
-        $exists = $this->Qc_gibson_model->get_defect_by_code($defectCode);
+        $exists = $this->Qc_gibson_model->get_category_defect_by_code($defectCode);
 
         if ($exists) {
             $rSave = $this->Qc_gibson_model->update_defect($defectCode, $aData);
