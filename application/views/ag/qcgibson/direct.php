@@ -346,7 +346,7 @@
     formData.append("judgement", document.getElementById("judgementSelect").value);
 
     try {
-      const r = await fetch("<?= site_url('ag/qcgibson/saveSerial'); ?>", {
+      const r = await fetch("<?= site_url('ag/qcgibson/savedirect'); ?>", {
         method: "POST",
         body: formData
       });
