@@ -254,10 +254,10 @@
                     </select>
 
                     <label style="margin-top:15px;">Defect Code <span style="color:red">*</span></label>
-                    <input type="text" id="defect_code" required />
+                    <input type="text" id="defect_code" placeholder="Enter defect code..." required />
 
                     <label style="margin-top:15px;">Defect Name <span style="color:red">*</span></label>
-                    <input type="text" id="defect_name" required />
+                    <input type="text" id="defect_name" placeholder="Enter defect name..." required />
 
                     <div class="btn-group">
                         <button type="reset" id="resetBtn" disabled>Reset</button>
