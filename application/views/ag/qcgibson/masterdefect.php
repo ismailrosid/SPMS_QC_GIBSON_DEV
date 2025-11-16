@@ -1,72 +1,227 @@
 <style>
-    /* === INPUT FORM SIMPLE STYLE (FOLLOW SCAN STYLE THEME) === */
-    .simple-form {
+    /* ==========================
+   MAIN CARD FORM STYLING
+   ========================== */
+    .card-form {
         border-radius: 8px;
         padding: 20px;
-        max-width: 500px;
-        margin: 30px auto;
+        max-width: 900px;
+        margin: 40px auto;
         font-family: Arial, sans-serif;
-        font-size: 17px;
+        font-size: 18px;
     }
 
-    .form-group {
-        margin-bottom: 18px;
+    .card-form-section {
+        background: #fafafa;
+        border: 1px solid #d9d9d9;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+
+    .card-form-section-header {
+        background: #d1e0f3;
+        padding: 12px 20px;
+        font-weight: bold;
+        font-size: 18px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: #555;
+    }
+
+    .card-form-section-body {
+        position: relative;
+        padding: 20px;
+        background: #fff;
+        font-size: 17px;
     }
 
     label {
-        font-weight: bold;
-        margin-bottom: 6px;
         display: block;
-        color: #333;
+        font-weight: bold;
+        color: #666;
+        margin-bottom: 6px;
+        font-size: 16px;
     }
 
-    .text-input {
+    input[type="text"] {
         width: 100%;
-        padding: 10px 12px;
-        border: 2px solid #d9d9d9;
-        border-radius: 6px;
-        font-size: 17px;
-        transition: 0.25s;
-        background: #fff;
+        padding: 7px 10px;
+        border: 1px solid #d9d9d9;
+        border-radius: 4px;
+        margin-bottom: 4px;
+        box-sizing: border-box;
+        font-size: 16px;
     }
 
-    .text-input:focus {
-        border-color: #acd1f8ff;
-        background: #eef6ff;
-        outline: none;
+    .btn-group {
+        margin-top: 15px;
+        text-align: right;
     }
 
-    #submitBtn2 {
-        width: 100%;
-        padding: 12px 0;
+    button {
+        padding: 6px 14px;
         border: 1px solid #d9d9d9;
         background: #f2f2f2;
         cursor: pointer;
         font-weight: bold;
         color: #555;
-        border-radius: 6px;
-        font-size: 18px;
+        margin-left: 6px;
+        border-radius: 4px;
         transition: 0.2s;
-        margin-top: 15px;
+        font-size: 16px;
     }
 
-    #submitBtn2:hover {
+    button:hover {
         background: #e6e6e6;
     }
 
-    #submitBtn2:disabled {
+    button:disabled {
         opacity: 0.6;
         cursor: not-allowed;
     }
 
+    /* ==========================
+   ERROR FIELD STYLING
+   ========================== */
+    .input-error {
+        border-color: red;
+        background-color: #ffe6e6;
+    }
+
+    #fieldErrorMsg {
+        color: red;
+        font-size: 14px;
+        display: none;
+        margin-top: 4px;
+    }
+
+    /* ==========================
+   ERROR / SUCCESS CARD STYLING
+   ========================== */
+    .error-card {
+        position: relative;
+        background: #fff;
+        border: 1px solid #d9d9d9;
+        border-radius: 6px;
+        padding: 20px 25px;
+        margin-bottom: 20px;
+        display: none;
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: opacity 0.4s ease, transform 0.4s ease;
+        font-size: 16px;
+        max-height: 300px;
+        overflow: hidden;
+        z-index: 5;
+    }
+
+    .error-card.show {
+        opacity: 1;
+        transform: translateY(0);
+        display: block;
+    }
+
+    .error-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .error-header-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .error-card h2 {
+        font-size: 20px;
+        font-weight: bold;
+        margin: 0;
+    }
+
+    .error-controls {
+        display: flex;
+        gap: 6px;
+    }
+
+    .error-btn {
+        background: #fff;
+        border: 1px solid #d9d9d9;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 16px;
+        border-radius: 4px;
+        text-align: center;
+        line-height: 22px;
+    }
+
+    .error-btn:hover {
+        background: #e6e6e6;
+        color: #555;
+    }
+
+    .error-card hr {
+        border: none;
+        border-top: 1px solid #d9d9d9;
+        margin: 15px 0;
+    }
+
+    .error-content {
+        opacity: 1;
+        margin-top: 10px;
+    }
+
+    .error-content.collapsed {
+        display: none;
+    }
+
+    .error-group {
+        margin-bottom: 18px;
+    }
+
+    .error-title {
+        display: inline-block;
+        background-color: #ddd;
+        padding: 3px 8px;
+        font-weight: bold;
+        color: #000000ce;
+        margin-bottom: 6px;
+        font-size: 16px;
+    }
+
+    .error-container {
+        margin-left: 0px;
+        color: red;
+        margin-top: 5px;
+        font-size: 15px;
+        max-height: 200px;
+        overflow-y: auto;
+        padding-right: 5px;
+    }
+
+    .error-container::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .error-container::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.3);
+        border-radius: 3px;
+    }
+
+    .error-container::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
     .spinner {
         display: inline-block;
-        width: 16px;
-        height: 16px;
+        width: 14px;
+        height: 14px;
         border: 2px solid #999;
         border-top-color: transparent;
         border-radius: 50%;
-        margin-right: 8px;
+        margin-right: 6px;
         animation: spin 0.8s linear infinite;
         vertical-align: middle;
     }
@@ -76,103 +231,187 @@
             transform: rotate(360deg);
         }
     }
-
-    /* === ERROR / SUCCESS CARD (COPY FROM MAIN) === */
-    .error-card2 {
-        background: #fff;
-        border: 1px solid #d9d9d9;
-        border-radius: 6px;
-        padding: 20px 25px;
-        margin-bottom: 15px;
-        display: none;
-        opacity: 0;
-        transform: translateY(-10px);
-        transition: opacity 0.4s ease, transform 0.4s ease;
-        font-size: 16px;
-    }
-
-    .error-card2.show {
-        display: block;
-        opacity: 1;
-        transform: translateY(0);
-    }
 </style>
 
-<div class="simple-form">
-    <div id="errorBox2" class="error-card2"></div>
+<body>
 
-    <form id="categoryForm">
-        <div class="form-group">
-            <label>Category Code <span style="color:red">*</span></label>
-            <input type="text" id="category_code" class="text-input" required />
+    <div class="card-form">
+        <div class="card-form-section">
+            <div class="card-form-section-header"><span>Add Category Defect</span></div>
+            <div class="card-form-section-body">
+
+                <!-- ERROR CARD -->
+                <div class="error-card" id="errorCard">
+                    <div class="error-header">
+                        <div class="error-header-left">
+                            <h2 id="errorTitle">Error!</h2>
+                        </div>
+                        <div class="error-controls">
+                            <button class="error-btn collapse-btn">-</button>
+                            <button class="error-btn close-btn">X</button>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="error-content">
+                        <div class="error-group">
+                            <div class="error-container" id="genericErrorList"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FORM INPUT -->
+                <form id="categoryForm">
+
+                    <label>Category Code <span style="color:red">*</span></label>
+                    <input type="text" id="category_code" required />
+                    <small id="codeError" style="display:none;color:red;"></small>
+
+                    <label style="margin-top:15px;">Category Name <span style="color:red">*</span></label>
+                    <input type="text" id="category_name" required />
+                    <small id="nameError" style="display:none;color:red;"></small>
+
+                    <div class="btn-group">
+                        <button type="reset" id="resetBtn" disabled>Reset</button>
+                        <button type="submit" id="saveBtn" disabled>Save</button>
+                    </div>
+
+                </form>
+
+            </div>
         </div>
+    </div>
 
-        <div class="form-group">
-            <label>Category Name <span style="color:red">*</span></label>
-            <input type="text" id="category_name" class="text-input" required />
-        </div>
+    <script>
+        const code = document.getElementById("category_code");
+        const nameF = document.getElementById("category_name");
+        const saveBtn = document.getElementById("saveBtn");
+        const resetBtn = document.getElementById("resetBtn");
 
-        <button type="submit" id="submitBtn2" disabled>Submit</button>
-    </form>
-</div>
+        const errorCard = document.getElementById("errorCard");
+        const errorListDiv = document.getElementById("genericErrorList");
+        const errorContent = document.querySelector(".error-content");
+        const collapseBtn = document.querySelector(".collapse-btn");
+        const closeBtn = document.querySelector(".close-btn");
+        const errorTitle = document.getElementById("errorTitle");
 
-<script>
-    const codeInput = document.getElementById("category_code");
-    const nameInput = document.getElementById("category_name");
-    const submitBtn2 = document.getElementById("submitBtn2");
-    const errorBox2 = document.getElementById("errorBox2");
+        function checkInput() {
+            const ok = code.value.trim() !== "" && nameF.value.trim() !== "";
+            saveBtn.disabled = !ok;
+            resetBtn.disabled = !ok;
+        }
 
-    function checkInputs() {
-        submitBtn2.disabled = !(codeInput.value.trim() && nameInput.value.trim());
-    }
+        code.addEventListener("input", checkInput);
+        nameF.addEventListener("input", checkInput);
 
-    codeInput.addEventListener("input", checkInputs);
-    nameInput.addEventListener("input", checkInputs);
+        document.getElementById("categoryForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            submitCategory();
+        });
 
-    function showMessage(type, message) {
-        errorBox2.style.display = "block";
-        errorBox2.innerHTML = message;
-        errorBox2.style.color = type === "success" ? "green" : "red";
+        resetBtn.addEventListener("click", function() {
+            code.value = "";
+            nameF.value = "";
+            saveBtn.disabled = true;
+            resetBtn.disabled = true;
+            hideCard();
+        });
 
-        setTimeout(() => errorBox2.classList.add("show"), 10);
-        setTimeout(() => {
-            errorBox2.classList.remove("show");
-            setTimeout(() => (errorBox2.style.display = "none"), 400);
-        }, 4000);
-    }
+        closeBtn.addEventListener("click", hideCard);
 
-    document.getElementById("categoryForm").addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        const originalText = submitBtn2.innerHTML;
-        submitBtn2.disabled = true;
-        submitBtn2.innerHTML = `<span class="spinner"></span>Processing...`;
-
-        const formData = new FormData();
-        formData.append("category_code", codeInput.value.trim());
-        formData.append("category_name", nameInput.value.trim());
-
-        try {
-            const res = await fetch("<?= site_url('ag/qcgibson/savecategory'); ?>", {
-                method: "POST",
-                body: formData,
-            });
-
-            const result = await res.json();
-
-            if (result.status === "success") {
-                showMessage("success", result.message);
-                codeInput.value = "";
-                nameInput.value = "";
+        collapseBtn.addEventListener("click", function() {
+            if (errorContent.classList.contains("collapsed")) {
+                errorContent.classList.remove("collapsed");
+                collapseBtn.textContent = "-";
             } else {
-                showMessage("error", result.message);
+                errorContent.classList.add("collapsed");
+                collapseBtn.textContent = "+";
+            }
+        });
+
+        function hideCard() {
+            errorCard.classList.remove("show");
+            setTimeout(() => errorCard.style.display = "none", 400);
+        }
+
+        async function submitCategory() {
+            saveBtn.disabled = true;
+            resetBtn.disabled = true;
+            const originalText = saveBtn.innerHTML;
+            saveBtn.innerHTML = `<span class="spinner"></span> Saving...`;
+
+            const formData = new FormData();
+            formData.append("category_code", code.value.trim());
+            formData.append("category_name", nameF.value.trim());
+
+            try {
+                const r = await fetch("<?= site_url('ag/qcgibson/savecategory'); ?>", {
+                    method: "POST",
+                    body: formData
+                });
+
+                const txt = await r.text();
+                let result;
+
+                try {
+                    result = JSON.parse(txt.trim());
+                } catch {
+                    showError("Server returned invalid JSON.");
+                    return;
+                }
+
+                if (result.status === "error") {
+                    showError(result.message, result.errors || []);
+                } else if (result.status === "success") {
+                    showSuccess(result.message);
+                    code.value = "";
+                    nameF.value = "";
+                } else {
+                    showError("Unknown server response.");
+                }
+
+            } catch (err) {
+                showError("Network error or server unreachable.");
+            } finally {
+                saveBtn.innerHTML = originalText;
+                checkInput();
+            }
+        }
+
+        function showError(message, groups = []) {
+            errorTitle.textContent = "Error!";
+            errorTitle.style.color = "red";
+            collapseBtn.style.display = "inline-block";
+            closeBtn.style.display = "none";
+
+            errorListDiv.innerHTML = "";
+
+            if (groups.length > 0) {
+                groups.forEach(g => {
+                    if (g.title && g.items) {
+                        errorListDiv.innerHTML += `<div class="error-title">${g.title}</div><div class="error-list">${g.items.map(i => `<p>${i}</p>`).join("")}</div>`;
+                    } else {
+                        errorListDiv.innerHTML += `<p>${g}</p>`;
+                    }
+                });
+            } else {
+                errorListDiv.innerHTML = `<p>${message}</p>`;
             }
 
-            checkInputs();
-        } catch (err) {
-            showMessage("error", "Failed to connect to server.");
-        } finally {
-            submitBtn2.innerHTML = originalText;
+            errorCard.style.display = "block";
+            setTimeout(() => errorCard.classList.add("show"), 10);
         }
-    });
-</script>
+
+        function showSuccess(message) {
+            errorTitle.textContent = "Success!";
+            errorTitle.style.color = "green";
+            collapseBtn.style.display = "none";
+            closeBtn.style.display = "inline-block";
+
+            errorListDiv.innerHTML = `<p style="color:black;">${message}</p>`;
+
+            errorCard.style.display = "block";
+            setTimeout(() => errorCard.classList.add("show"), 10);
+
+            setTimeout(hideCard, 10000);
+        }
+    </script>
