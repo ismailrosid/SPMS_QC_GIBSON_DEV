@@ -63,6 +63,7 @@
   }
 
   /* ===== CURSOR BLINK ===== */
+  /* ===== CURSOR BLINK ===== */
   .scan-container.active .cursor-blink {
     width: 2px;
     height: 22px;
