@@ -217,6 +217,43 @@
     border-color: #bfbfbf;
     box-shadow: none;
   }
+
+  .custom-select-wrapper {
+    position: relative;
+    margin-bottom: 4px;
+  }
+
+  #defectSearch {
+    width: 100%;
+    padding: 7px 10px;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 16px;
+  }
+
+  .custom-select-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    background: #fff;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 10;
+    display: none;
+  }
+
+  .custom-select-item {
+    padding: 7px 10px;
+    cursor: pointer;
+  }
+
+  .custom-select-item:hover {
+    background: #f0f0f0;
+  }
 </style>
 
 <div class="card-form">
@@ -248,14 +285,10 @@
       <form id="serialForm">
         <!-- DEFECT CODE -->
         <label>Defect Code <span style="color:red">*</span></label>
-        <select id="defect_code" name="defect_code" required>
-          <option value="">-- Select Defect --</option>
-          <?php foreach ($defects as $d): ?>
-            <option value="<?= $d['defect_code'] ?>">
-              <?= $d['defect_code'] ?> - <?= $d['defect_name'] ?>
-            </option>
-          <?php endforeach; ?>
-        </select>
+        <div class="custom-select-wrapper">
+          <input type="text" id="defectSearch" placeholder="Search defect..." autocomplete="off" required />
+          <div id="defectList" class="custom-select-list"></div>
+        </div>
 
         <!-- SERIAL NUMBER -->
         <label style="margin-top:15px;">Serial Number <span style="color:red">*</span></label>
@@ -272,6 +305,55 @@
 </div>
 
 <script>
+  const defects = [
+    <?php foreach ($defects as $d): ?> {
+        code: "<?= $d['defect_code'] ?>",
+        name: "<?= $d['defect_name'] ?>"
+      },
+    <?php endforeach; ?>
+  ];
+
+  const defectSearch = document.getElementById('defectSearch');
+  const defectList = document.getElementById('defectList');
+  let selectedDefect = null;
+
+  function showList(filtered) {
+    defectList.innerHTML = '';
+    if (filtered.length === 0) {
+      defectList.style.display = 'none';
+      return;
+    }
+    filtered.forEach(d => {
+      const div = document.createElement('div');
+      div.classList.add('custom-select-item');
+      div.textContent = `${d.code} - ${d.name}`;
+      div.addEventListener('click', () => {
+        defectSearch.value = `${d.code} - ${d.name}`;
+        selectedDefect = d.code;
+        defectList.style.display = 'none';
+        checkInput();
+      });
+      defectList.appendChild(div);
+    });
+    defectList.style.display = 'block';
+  }
+
+  defectSearch.addEventListener('input', () => {
+    const query = defectSearch.value.toLowerCase();
+    const filtered = defects.filter(d =>
+      d.code.toLowerCase().includes(query) ||
+      d.name.toLowerCase().includes(query)
+    );
+    showList(filtered);
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.custom-select-wrapper')) {
+      defectList.style.display = 'none';
+    }
+  });
+
+  // 
   const serialInput = document.getElementById("serial_no");
   const saveBtn = document.getElementById("saveBtn");
   const resetBtn = document.getElementById("resetBtn");
@@ -282,6 +364,7 @@
   const closeBtn = document.querySelector(".close-btn");
   const errorTitle = document.getElementById("errorTitle");
   const errorContent = document.querySelector(".error-content");
+
 
   function checkInput() {
     const hasValue = serialInput.value.trim() !== "";
