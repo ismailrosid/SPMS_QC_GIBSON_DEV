@@ -204,6 +204,13 @@
             transform: rotate(360deg);
         }
     }
+
+    input:focus,
+    select:focus {
+        outline: none;
+        border-color: #bfbfbf;
+        box-shadow: none;
+    }
 </style>
 
 <body>
