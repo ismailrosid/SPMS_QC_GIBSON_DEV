@@ -56,31 +56,11 @@
         font-size: 16px;
     }
 
-    .btn-group {
-        margin-top: 15px;
-        text-align: right;
-    }
-
-    button {
-        padding: 6px 14px;
-        border: 1px solid #d9d9d9;
-        background: #f2f2f2;
-        cursor: pointer;
-        font-weight: bold;
-        color: #555;
-        margin-left: 6px;
-        border-radius: 4px;
-        transition: 0.2s;
-        font-size: 16px;
-    }
-
-    button:hover:not(:disabled) {
-        background: #e6e6e6;
-    }
-
-    button:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
+    input:focus,
+    select:focus {
+        outline: none;
+        border-color: #bfbfbf;
+        box-shadow: none;
     }
 
     /* ==========================
@@ -163,20 +143,6 @@
         display: none;
     }
 
-    .error-group {
-        margin-bottom: 18px;
-    }
-
-    .error-title {
-        display: inline-block;
-        background-color: #ddd;
-        padding: 3px 8px;
-        font-weight: bold;
-        color: #000000ce;
-        margin-bottom: 6px;
-        font-size: 16px;
-    }
-
     .error-container {
         margin-left: 0px;
         color: red;
@@ -204,14 +170,8 @@
             transform: rotate(360deg);
         }
     }
-
-    input:focus,
-    select:focus {
-        outline: none;
-        border-color: #bfbfbf;
-        box-shadow: none;
-    }
 </style>
+
 
 <body>
     <div class="card-form">
