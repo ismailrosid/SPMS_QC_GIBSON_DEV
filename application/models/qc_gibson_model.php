@@ -105,7 +105,7 @@ class Qc_gibson_model extends Model
      */
     function get_all_category_defect()
     {
-        $query = $this->db->select('SysId, category_code, category_name')
+        $query = $this->db->select('sysid, category_code, category_name')
             ->from('tgibson_category_defect')
             ->order_by('category_code', 'ASC')
             ->get();
@@ -118,7 +118,7 @@ class Qc_gibson_model extends Model
      */
     function get_category_defect_by_code($code)
     {
-        $query = $this->db->select('SysId, category_code, category_name')
+        $query = $this->db->select('sysid, category_code, category_name')
             ->from('tgibson_category_defect')
             ->where('category_code', $code)
             ->get();
