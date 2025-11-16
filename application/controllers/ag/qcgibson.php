@@ -173,11 +173,10 @@ class QcGibson extends Controller
         header('Content-Type: application/json');
 
         // Get input values from POST
-        $serialNo  = trim($this->input->post('serial_no', true));
-        $scanDate  = trim($this->input->post('date', true));
-        $userScan  = trim($this->input->post('user_scan', true));
-        $location  = trim($this->input->post('location', true));
-        $judgment  = trim($this->input->post('judgment', true));
+        $serialNo   = trim($this->input->post('serial_no', true));
+        $defectCode = trim($this->input->post('defect_code', true));
+        $country    = trim($this->input->post('country', true));
+        $judgment   = trim($this->input->post('judgement', true)); // sesuaikan nama POST
 
         // Validate required field
         if (empty($serialNo)) {
@@ -190,10 +189,9 @@ class QcGibson extends Controller
         }
 
         // Set default values if empty
-        if (empty($scanDate))  $scanDate  = date('Y-m-d H:i:s');
-        if (empty($userScan))  $userScan  = $this->sUsername;
-        if (empty($location))  $location  = NULL;
-        if (empty($judgment))  $judgment  = 'good';
+        if (empty($judgment)) $judgment = 'good';
+        if (empty($country))  $country = NULL;
+        if (empty($defectCode)) $defectCode = NULL;
 
         // Check if serial number exists in Gibson database
         $isGibson = $this->Qc_gibson_model->get_serials_gibson(array($serialNo));
@@ -209,12 +207,13 @@ class QcGibson extends Controller
         // Prepare data array for insert/update
         $aData = array(
             'serial_no'   => $serialNo,
-            'date'        => $scanDate,
-            'user_scan'   => $userScan,
-            'location'    => $location,
+            'defect_code' => $defectCode,
+            'country'     => $country,
             'judgment'    => $judgment,
+            'guitar_type' => 'AG', // hardcode AG
             'uploaded_by' => $this->sUsername,
-            'source'      => 'direct'
+            'source'      => 'direct',
+            'date'        => date('Y-m-d H:i:s')
         );
 
         // Start database transaction
@@ -250,6 +249,7 @@ class QcGibson extends Controller
         ));
         exit();
     }
+
 
     function doupload()
     {
