@@ -260,8 +260,8 @@
         <!-- JUDGEMENT -->
         <label style="margin-top:15px;">Judgement <span style="color:red">*</span></label>
         <select id="judgementSelect" name="judgement" required>
-          <option value="Pass" selected>Pass</option>
-          <option value="Not Pass">Not Pass</option>
+          <option value="1" selected>Pass</option>
+          <option value="0">Not Pass</option>
         </select>
 
         <hr>

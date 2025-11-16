@@ -176,7 +176,8 @@ class QcGibson extends Controller
         $serialNo   = trim($this->input->post('serial_no', true));
         $defectCode = trim($this->input->post('defect_code', true));
         $country    = trim($this->input->post('country', true));
-        $judgment   = trim($this->input->post('judgement', true)); // sesuaikan nama POST
+        $judgmentPost = trim($this->input->post('judgement', true));
+        $judgment = ($judgmentPost === "1") ? 'good' : 'nogood';
 
         // Validate required field
         if (empty($serialNo)) {
