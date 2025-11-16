@@ -15,7 +15,9 @@ class qcGibsonReport extends Controller
         parent::Controller();
         $this->load->library('session');
 
-        if (!$this->session->userdata('b_eg_report_read')) show_error('Access Denied');
+        if (!$this->session->userdata('b_eg_checker_gibson')) {
+            show_error('Access Denied');
+        }
 
         $this->sUsername = $this->session->userdata('s_username');
         $this->sLevel = $this->session->userdata('s_level');

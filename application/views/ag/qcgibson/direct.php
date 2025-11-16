@@ -313,11 +313,12 @@
     }
   });
 
+
   // === Display message card ===
   function showCard(message, type) {
     const errorTitle = document.getElementById("errorTitle");
     errorTitle.textContent = type === "success" ? "Success!" : "Error!";
-    errorTitle.style.color = type === "success" ? "green" : "red";
+    errorTitle.style.color = type === "success" ? "black" : "red";
     const textColor = type === "success" ? "green" : "red";
     errorListDiv.innerHTML = `<p style="color:${textColor};">${message}</p>`;
     errorCard.style.display = "block";
@@ -329,7 +330,14 @@
       scanContainer.classList.remove("active");
       submitBtn.disabled = true;
     }
+
+    // === Auto hide popup after 5 seconds ===
+    setTimeout(() => {
+      errorCard.classList.remove("show");
+      setTimeout(() => (errorCard.style.display = "none"), 400);
+    }, 5000);
   }
+
 
   // === Close card ===
   closeBtn.addEventListener("click", () => {

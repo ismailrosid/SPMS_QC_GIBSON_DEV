@@ -144,12 +144,15 @@
 				</ul>
 			</td>
 		<?php	} ?>
-
-		<!-- QC Gibson Menu Update 2025 -->
+		<!--  [Update 2025] QC Gibson Menu Integration (AG & EG) -->
 		<?php if ($this->session->userdata('b_ag_checker_gibson')) { ?>
 			<td width="250px" valign="top" style="border-left:1px solid #76ACE2;">
 				<font class="content_title">Acoustic Guitar (QC Gibson)</font>
 				<ul class="list_menu">
+					<li>
+						<a href="{basesiteurl}/ag/qcgibson/masterdefect">Master Code Defect Form</a><br>
+						Manage and update the master list of defect codes used in QC Gibson
+					</li>
 					<li>
 						<a href="{basesiteurl}/ag/qcgibson/scan">Gibson Checker Upload Form</a><br>
 						Upload the serial numbers of Acoustic Guitar items for QC Gibson verification (Pass / Not Pass)
@@ -193,7 +196,7 @@
 				</ul>
 			</td>
 		<?php } ?>
-		<!-- END QC Gibson Menu Update 2025 -->
+		//
 
 	</tr>
 </table>

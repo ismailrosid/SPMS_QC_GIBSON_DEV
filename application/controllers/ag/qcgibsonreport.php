@@ -15,12 +15,13 @@ class qcGibsonReport extends Controller
         parent::Controller();
         $this->load->library('session');
 
-        if (!$this->session->userdata('b_ag_report_read')) show_error('Access Denied');
+        if (!$this->session->userdata('b_ag_checker_gibson')) {
+            show_error('Access Denied');
+        }
 
         $this->sUsername = $this->session->userdata('s_username');
         $this->sLevel = $this->session->userdata('s_level');
 
-        $this->load->model('ag/Report2_model');
         $this->load->model('ag/reportQcGibson_model');
         $this->load->model('Util_model');
 

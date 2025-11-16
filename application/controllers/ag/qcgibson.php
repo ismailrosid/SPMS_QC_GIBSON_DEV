@@ -40,22 +40,21 @@ class QcGibson extends Controller
         $this->aDivision   = $this->config->item('division');
     }
 
-    function index($sMessage = '')
+    function masterdefect()
     {
-        $messages = array('1' => 'Data berhasil disimpan.', '2' => 'Upload file gagal.', '3' => 'Data berhasil dihapus.');
-        $aDisplay = array(
-            'baseurl'          => base_url(),
-            'basesiteurl'      => site_url(),
-            'siteurl'          => site_url() . '/ag/qcgibson/',
-            'PAGE_TITLE'       => 'SPMS-G. QC Gibson Report',
-            'sGlobalUserName'  => $this->sUsername,
-            'sGlobalUserLevel' => $this->sLevel,
-            'MESSAGES'         => isset($messages[$sMessage]) ? $messages[$sMessage] : ''
-        );
+        echo "hallo halllooooo";
+        // $aDisplay = array(
+        //     'baseurl'          => base_url(),
+        //     'basesiteurl'      => site_url(),
+        //     'siteurl'          => site_url() . '/ag/qcgibson/',
+        //     'PAGE_TITLE'       => 'SPMS-G. Master Code Defect',
+        //     'sGlobalUserName'  => $this->sUsername,
+        //     'sGlobalUserLevel' => $this->sLevel
+        // );
 
-        $this->parser->parse('header', $aDisplay);
-        $this->parser->parse('ag/qcgibson/index', $aDisplay);
-        $this->parser->parse('footer', $aDisplay);
+        // $this->parser->parse('header', $aDisplay);
+        // $this->parser->parse('ag/qcgibson/masterdefect', $aDisplay);
+        // $this->parser->parse('footer', $aDisplay);
     }
 
     function scan()
