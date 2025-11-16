@@ -90,8 +90,8 @@ class QcGibson extends Controller
             'category_code' => $categoryCode,
             'defect_code'   => $defectCode,
             'defect_name'   => $defectName,
-            'created_by'    => $this->sUsername,
-            'created_at'    => date('Y-m-d H:i:s')
+            // 'created_by'    => $this->sUsername,
+            // 'created_at'    => date('Y-m-d H:i:s')
         );
 
         // Start database transaction

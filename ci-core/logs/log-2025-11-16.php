@@ -114,3 +114,15 @@ LINE 1: SELECT &quot;sysId&quot;, &quot;category_code&quot;, &quot;category_name
 ERROR - 2025-11-16 18:20:00 --> Query error: ERROR:  column "sysId" does not exist
 LINE 1: SELECT "sysId", "category_code", "category_name"
                ^
+ERROR - 2025-11-16 18:48:04 --> Severity: Warning  --> pg_query() [<a href='function.pg-query'>function.pg-query</a>]: Query failed: ERROR:  column &quot;created_by&quot; of relation &quot;tgibson_defect_code&quot; does not exist
+LINE 1: ...&quot; (&quot;category_code&quot;, &quot;defect_code&quot;, &quot;defect_name&quot;, &quot;created_b...
+                                                             ^ C:\xampp\htdocs\done\ci-core\database\drivers\postgre\postgre_driver.php 153
+ERROR - 2025-11-16 18:48:04 --> Query error: ERROR:  column "created_by" of relation "tgibson_defect_code" does not exist
+LINE 1: ..." ("category_code", "defect_code", "defect_name", "created_b...
+                                                             ^
+ERROR - 2025-11-16 18:48:11 --> Severity: Warning  --> pg_query() [<a href='function.pg-query'>function.pg-query</a>]: Query failed: ERROR:  column &quot;created_by&quot; of relation &quot;tgibson_defect_code&quot; does not exist
+LINE 1: ...&quot; (&quot;category_code&quot;, &quot;defect_code&quot;, &quot;defect_name&quot;, &quot;created_b...
+                                                             ^ C:\xampp\htdocs\done\ci-core\database\drivers\postgre\postgre_driver.php 153
+ERROR - 2025-11-16 18:48:11 --> Query error: ERROR:  column "created_by" of relation "tgibson_defect_code" does not exist
+LINE 1: ..." ("category_code", "defect_code", "defect_name", "created_b...
+                                                             ^
