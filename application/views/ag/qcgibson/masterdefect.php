@@ -45,7 +45,8 @@
         font-size: 16px;
     }
 
-    input[type="text"] {
+    input[type="text"],
+    select {
         width: 100%;
         padding: 7px 10px;
         border: 1px solid #d9d9d9;
@@ -83,22 +84,7 @@
     }
 
     /* ==========================
-   ERROR FIELD STYLING
-   ========================== */
-    .input-error {
-        border-color: red;
-        background-color: #ffe6e6;
-    }
-
-    #fieldErrorMsg {
-        color: red;
-        font-size: 14px;
-        display: none;
-        margin-top: 4px;
-    }
-
-    /* ==========================
-   ERROR / SUCCESS CARD STYLING
+   ERROR CARD STYLING
    ========================== */
     .error-card {
         position: relative;
@@ -201,19 +187,6 @@
         padding-right: 5px;
     }
 
-    .error-container::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    .error-container::-webkit-scrollbar-thumb {
-        background-color: rgba(0, 0, 0, 0.3);
-        border-radius: 3px;
-    }
-
-    .error-container::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
     .spinner {
         display: inline-block;
         width: 14px;
@@ -237,7 +210,8 @@
 
     <div class="card-form">
         <div class="card-form-section">
-            <div class="card-form-section-header"><span>Add Category Defect</span></div>
+            <div class="card-form-section-header"><span>Add Defect Code</span></div>
+
             <div class="card-form-section-body">
 
                 <!-- ERROR CARD -->
@@ -259,16 +233,24 @@
                     </div>
                 </div>
 
-                <!-- FORM INPUT -->
-                <form id="categoryForm">
+                <!-- ==========================
+                 FORM DEFECT CODE
+            ========================== -->
+                <form id="defectForm">
 
-                    <label>Category Code <span style="color:red">*</span></label>
-                    <input type="text" id="category_code" required />
-                    <small id="codeError" style="display:none;color:red;"></small>
+                    <label>Category <span style="color:red">*</span></label>
+                    <select id="category_code" required>
+                        <option value="">-- Select Category --</option>
+                        <option value="CAT001">CAT001 - Mechanical</option>
+                        <option value="CAT002">CAT002 - Electrical</option>
+                        <option value="CAT003">CAT003 - Visual</option>
+                    </select>
 
-                    <label style="margin-top:15px;">Category Name <span style="color:red">*</span></label>
-                    <input type="text" id="category_name" required />
-                    <small id="nameError" style="display:none;color:red;"></small>
+                    <label style="margin-top:15px;">Defect Code <span style="color:red">*</span></label>
+                    <input type="text" id="defect_code" required />
+
+                    <label style="margin-top:15px;">Defect Name <span style="color:red">*</span></label>
+                    <input type="text" id="defect_name" required />
 
                     <div class="btn-group">
                         <button type="reset" id="resetBtn" disabled>Reset</button>
@@ -282,35 +264,43 @@
     </div>
 
     <script>
-        const code = document.getElementById("category_code");
-        const nameF = document.getElementById("category_name");
+        const category = document.getElementById("category_code");
+        const defectCode = document.getElementById("defect_code");
+        const defectName = document.getElementById("defect_name");
+
         const saveBtn = document.getElementById("saveBtn");
         const resetBtn = document.getElementById("resetBtn");
 
         const errorCard = document.getElementById("errorCard");
         const errorListDiv = document.getElementById("genericErrorList");
-        const errorContent = document.querySelector(".error-content");
         const collapseBtn = document.querySelector(".collapse-btn");
         const closeBtn = document.querySelector(".close-btn");
         const errorTitle = document.getElementById("errorTitle");
+        const errorContent = document.querySelector(".error-content");
 
         function checkInput() {
-            const ok = code.value.trim() !== "" && nameF.value.trim() !== "";
+            const ok =
+                category.value.trim() !== "" &&
+                defectCode.value.trim() !== "" &&
+                defectName.value.trim() !== "";
+
             saveBtn.disabled = !ok;
             resetBtn.disabled = !ok;
         }
 
-        code.addEventListener("input", checkInput);
-        nameF.addEventListener("input", checkInput);
+        category.addEventListener("change", checkInput);
+        defectCode.addEventListener("input", checkInput);
+        defectName.addEventListener("input", checkInput);
 
-        document.getElementById("categoryForm").addEventListener("submit", function(e) {
+        document.getElementById("defectForm").addEventListener("submit", function(e) {
             e.preventDefault();
-            submitCategory();
+            submitDefect();
         });
 
         resetBtn.addEventListener("click", function() {
-            code.value = "";
-            nameF.value = "";
+            category.value = "";
+            defectCode.value = "";
+            defectName.value = "";
             saveBtn.disabled = true;
             resetBtn.disabled = true;
             hideCard();
@@ -319,13 +309,8 @@
         closeBtn.addEventListener("click", hideCard);
 
         collapseBtn.addEventListener("click", function() {
-            if (errorContent.classList.contains("collapsed")) {
-                errorContent.classList.remove("collapsed");
-                collapseBtn.textContent = "-";
-            } else {
-                errorContent.classList.add("collapsed");
-                collapseBtn.textContent = "+";
-            }
+            const collapsed = errorContent.classList.toggle("collapsed");
+            collapseBtn.textContent = collapsed ? "+" : "-";
         });
 
         function hideCard() {
@@ -333,18 +318,20 @@
             setTimeout(() => errorCard.style.display = "none", 400);
         }
 
-        async function submitCategory() {
+        async function submitDefect() {
             saveBtn.disabled = true;
             resetBtn.disabled = true;
+
             const originalText = saveBtn.innerHTML;
             saveBtn.innerHTML = `<span class="spinner"></span> Saving...`;
 
             const formData = new FormData();
-            formData.append("category_code", code.value.trim());
-            formData.append("category_name", nameF.value.trim());
+            formData.append("category_code", category.value.trim());
+            formData.append("defect_code", defectCode.value.trim());
+            formData.append("defect_name", defectName.value.trim());
 
             try {
-                const r = await fetch("<?= site_url('ag/qcgibson/savecategory'); ?>", {
+                const r = await fetch("<?= site_url('ag/qcgibson/savedefect'); ?>", {
                     method: "POST",
                     body: formData
                 });
@@ -355,7 +342,7 @@
                 try {
                     result = JSON.parse(txt.trim());
                 } catch {
-                    showError("Server returned invalid JSON.");
+                    showError("Invalid server JSON");
                     return;
                 }
 
@@ -363,8 +350,9 @@
                     showError(result.message, result.errors || []);
                 } else if (result.status === "success") {
                     showSuccess(result.message);
-                    code.value = "";
-                    nameF.value = "";
+                    category.value = "";
+                    defectCode.value = "";
+                    defectName.value = "";
                 } else {
                     showError("Unknown server response.");
                 }
@@ -388,7 +376,12 @@
             if (groups.length > 0) {
                 groups.forEach(g => {
                     if (g.title && g.items) {
-                        errorListDiv.innerHTML += `<div class="error-title">${g.title}</div><div class="error-list">${g.items.map(i => `<p>${i}</p>`).join("")}</div>`;
+                        errorListDiv.innerHTML += `
+                        <div class="error-title">${g.title}</div>
+                        <div class="error-list">
+                            ${g.items.map(i => `<p>${i}</p>`).join("")}
+                        </div>
+                    `;
                     } else {
                         errorListDiv.innerHTML += `<p>${g}</p>`;
                     }
@@ -412,6 +405,6 @@
             errorCard.style.display = "block";
             setTimeout(() => errorCard.classList.add("show"), 10);
 
-            setTimeout(hideCard, 10000);
+            setTimeout(hideCard, 5000);
         }
     </script>
