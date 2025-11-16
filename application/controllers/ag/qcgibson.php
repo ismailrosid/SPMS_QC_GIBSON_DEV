@@ -132,22 +132,28 @@ class QcGibson extends Controller
         exit();
     }
 
-
     function scan()
     {
+        $this->load->model('Qc_gibson_model');
+
+        $defects = $this->Qc_gibson_model->get_defect();
+
         $aDisplay = array(
             'baseurl'          => base_url(),
             'basesiteurl'      => site_url(),
             'siteurl'          => site_url() . '/ag/qcgibson/',
             'PAGE_TITLE'       => 'SPMS-G. Scan QC Gibson',
             'sGlobalUserName'  => $this->sUsername,
-            'sGlobalUserLevel' => $this->sLevel
+            'sGlobalUserLevel' => $this->sLevel,
+            'defects'          => $defects, // All defects sent to the view
         );
 
+        // Parse the header, main view, and footer
         $this->parser->parse('header', $aDisplay);
         $this->parser->parse('ag/qcgibson/scan', $aDisplay);
         $this->parser->parse('footer', $aDisplay);
     }
+
 
     function direct()
     {
