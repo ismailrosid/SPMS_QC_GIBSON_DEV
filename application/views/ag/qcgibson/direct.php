@@ -52,6 +52,7 @@
     text-align: center;
     padding: 10px;
     transition: all 0.25s ease-in-out;
+    position: relative;
   }
 
   .scan-container.active,
@@ -60,6 +61,33 @@
     background: #eef6ff;
     outline: none;
   }
+
+  /* ===== CURSOR BLINK ===== */
+  .scan-container.active .cursor-blink {
+    width: 2px;
+    height: 22px;
+    background: #333;
+    display: inline-block;
+    margin-left: 4px;
+    animation: blinkCursor 0.8s steps(2, start) infinite;
+    vertical-align: middle;
+  }
+
+  @keyframes blinkCursor {
+    0% {
+      opacity: 1;
+    }
+
+    50% {
+      opacity: 0;
+    }
+
+    100% {
+      opacity: 1;
+    }
+  }
+
+  /* ========================= */
 
   #serial_no {
     display: none;
@@ -246,46 +274,54 @@
   const closeBtn = document.querySelector(".close-btn");
   const scanContainer = document.getElementById("scanContainer");
   submitBtn.disabled = true;
-  // === Enable or disable submit button based on input ===
+
   function updateSubmitState() {
     submitBtn.disabled = !serialInput.value.trim();
   }
 
-  // === Focus scan container on click ===
   scanContainer.addEventListener("click", () => {
     scanContainer.classList.add("active");
     scanContainer.focus();
+    refreshDisplay();
   });
 
-  // === Remove active style if input is empty on blur ===
   scanContainer.addEventListener("blur", () => {
     if (!serialInput.value.trim()) scanContainer.classList.remove("active");
+    refreshDisplay();
   });
 
-  // === Keyboard input handling ===
   scanContainer.addEventListener("keydown", (e) => {
-    if (e.key === "Backspace") serialInput.value = serialInput.value.slice(0, -1);
-    else if (e.key.length === 1) serialInput.value += e.key.toUpperCase();
+    if (e.key === "Backspace") {
+      serialInput.value = serialInput.value.slice(0, -1);
+    } else if (e.key.length === 1) {
+      serialInput.value += e.key.toUpperCase();
+    }
 
-    scanContainer.textContent =
-      serialInput.value.toUpperCase() || "Scan or type serial number here";
-    if (serialInput.value.trim()) scanContainer.classList.add("active");
+    refreshDisplay();
     updateSubmitState();
   });
 
-  // === Handle paste event ===
   scanContainer.addEventListener("paste", (e) => {
     e.preventDefault();
     const pasteText = (e.clipboardData || window.clipboardData).getData("text").trim();
     if (pasteText) {
       serialInput.value = pasteText.toUpperCase();
-      scanContainer.textContent = serialInput.value;
       scanContainer.classList.add("active");
     }
+    refreshDisplay();
     updateSubmitState();
   });
 
-  // === Form submission ===
+  function refreshDisplay() {
+    if (!serialInput.value.trim()) {
+      scanContainer.innerHTML = "Scan or type serial number here";
+      return;
+    }
+
+    scanContainer.innerHTML =
+      serialInput.value.toUpperCase() + `<span class="cursor-blink"></span>`;
+  }
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const serialNo = serialInput.value.trim();
@@ -313,8 +349,6 @@
     }
   });
 
-
-  // === Display message card ===
   function showCard(message, type) {
     const errorTitle = document.getElementById("errorTitle");
     errorTitle.textContent = type === "success" ? "Success!" : "Error!";
@@ -326,20 +360,17 @@
 
     if (type === "success") {
       serialInput.value = "";
-      scanContainer.textContent = "Scan or type serial number here";
+      scanContainer.innerHTML = "Scan or type serial number here";
       scanContainer.classList.remove("active");
       submitBtn.disabled = true;
     }
 
-    // === Auto hide popup after 5 seconds ===
     setTimeout(() => {
       errorCard.classList.remove("show");
       setTimeout(() => (errorCard.style.display = "none"), 400);
     }, 5000);
   }
 
-
-  // === Close card ===
   closeBtn.addEventListener("click", () => {
     errorCard.classList.remove("show");
     setTimeout(() => (errorCard.style.display = "none"), 400);
