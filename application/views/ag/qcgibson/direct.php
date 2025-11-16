@@ -215,7 +215,7 @@
 
 <div class="card-form">
   <div class="card-form-section">
-    <div class="card-form-section-header"><span>Scan Serial Number</span></div>
+    <div class="card-form-section-header"><span>Form Redirect</span></div>
 
     <div class="card-form-section-body">
 
