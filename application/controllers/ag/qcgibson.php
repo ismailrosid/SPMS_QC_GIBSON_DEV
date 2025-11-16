@@ -42,19 +42,18 @@ class QcGibson extends Controller
 
     function masterdefect()
     {
-        echo "hallo halllooooo";
-        // $aDisplay = array(
-        //     'baseurl'          => base_url(),
-        //     'basesiteurl'      => site_url(),
-        //     'siteurl'          => site_url() . '/ag/qcgibson/',
-        //     'PAGE_TITLE'       => 'SPMS-G. Master Code Defect',
-        //     'sGlobalUserName'  => $this->sUsername,
-        //     'sGlobalUserLevel' => $this->sLevel
-        // );
+        $aDisplay = array(
+            'baseurl'          => base_url(),
+            'basesiteurl'      => site_url(),
+            'siteurl'          => site_url() . '/ag/qcgibson/',
+            'PAGE_TITLE'       => 'SPMS-G. Master Code Defect',
+            'sGlobalUserName'  => $this->sUsername,
+            'sGlobalUserLevel' => $this->sLevel
+        );
 
-        // $this->parser->parse('header', $aDisplay);
-        // $this->parser->parse('ag/qcgibson/masterdefect', $aDisplay);
-        // $this->parser->parse('footer', $aDisplay);
+        $this->parser->parse('header', $aDisplay);
+        $this->parser->parse('ag/qcgibson/masterdefect', $aDisplay);
+        $this->parser->parse('footer', $aDisplay);
     }
 
     function scan()
