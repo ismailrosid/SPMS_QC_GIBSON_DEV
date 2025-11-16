@@ -359,12 +359,12 @@
     errorCard.style.display = "block";
     setTimeout(() => errorCard.classList.add("show"), 10);
 
-    if (type === "success") {
-      serialInput.value = "";
-      scanContainer.innerHTML = "Scan or type serial number here";
-      scanContainer.classList.remove("active");
-      submitBtn.disabled = true;
-    }
+    // if (type === "success") {
+    //   serialInput.value = "";
+    //   scanContainer.innerHTML = "Scan or type serial number here";
+    //   scanContainer.classList.remove("active");
+    //   submitBtn.disabled = true;
+    // }
 
     setTimeout(() => {
       errorCard.classList.remove("show");
