@@ -45,7 +45,8 @@
     font-size: 16px;
   }
 
-  input[type="text"] {
+  input[type="text"],
+  select {
     width: 100%;
     padding: 7px 10px;
     border: 1px solid #d9d9d9;
