@@ -45,7 +45,8 @@
     font-size: 16px;
   }
 
-  input[type="text"] {
+  input[type="text"],
+  select {
     width: 100%;
     padding: 7px 10px;
     border: 1px solid #d9d9d9;
@@ -55,7 +56,8 @@
     font-size: 16px;
   }
 
-  input:focus {
+  input:focus,
+  select:focus {
     outline: none;
     border-color: #bfbfbf;
     box-shadow: none;
@@ -218,15 +220,6 @@
     margin-bottom: 4px;
   }
 
-  #defectSearch {
-    width: 100%;
-    padding: 7px 10px;
-    border: 1px solid #d9d9d9;
-    border-radius: 4px;
-    box-sizing: border-box;
-    font-size: 16px;
-  }
-
   .custom-select-list {
     position: absolute;
     top: 100%;
@@ -255,7 +248,6 @@
 <div class="card-form">
   <div class="card-form-section">
     <div class="card-form-section-header"><span>Scan Serial Number</span></div>
-
     <div class="card-form-section-body">
 
       <!-- ERROR CARD -->
@@ -282,9 +274,17 @@
         <!-- DEFECT CODE -->
         <label>Defect Code <span style="color:red">*</span></label>
         <div class="custom-select-wrapper">
-          <input type="text" id="defectSearch" placeholder="Search defect..." autocomplete="off" required />
+          <input type="text" id="defectSearch" placeholder="Search defect..." autocomplete="off" required value="No Defect" />
           <div id="defectList" class="custom-select-list"></div>
         </div>
+
+        <!-- COUNTRY -->
+        <label style="margin-top:15px;">Country <span style="color:red">*</span></label>
+        <input type="text" name="country" value="All" readonly />
+
+        <!-- JUDGEMENT -->
+        <label style="margin-top:15px;">Judgement <span style="color:red">*</span></label>
+        <input type="text" name="judgement" value="Pass" readonly />
 
         <!-- SERIAL NUMBER -->
         <label style="margin-top:15px;">Serial Number <span style="color:red">*</span></label>
@@ -301,7 +301,6 @@
 </div>
 
 <script>
-  /* ======== DEFECT DATA ======== */
   const defects = [
     <?php foreach ($defects as $d): ?> {
         code: "<?= $d['defect_code'] ?>",
@@ -312,14 +311,12 @@
 
   const defectSearch = document.getElementById('defectSearch');
   const defectList = document.getElementById('defectList');
-  let selectedDefect = null;
-  let activeIndex = -1; // for keyboard navigation
+  let selectedDefect = "No Defect";
+  let activeIndex = -1;
 
-  /* ======== SHOW DROPDOWN ======== */
   function showList(filtered) {
     defectList.innerHTML = '';
-    activeIndex = -1; // reset active index
-
+    activeIndex = -1;
     if (filtered.length === 0) {
       defectList.style.display = 'none';
       return;
@@ -329,18 +326,12 @@
       const div = document.createElement('div');
       div.classList.add('custom-select-item');
       div.textContent = `${d.code} - ${d.name}`;
-
-      div.addEventListener('click', () => {
-        selectDefect(d);
-      });
-
+      div.addEventListener('click', () => selectDefect(d));
       defectList.appendChild(div);
     });
-
     defectList.style.display = 'block';
   }
 
-  /* ======== SELECT DEFECT ======== */
   function selectDefect(d) {
     defectSearch.value = `${d.code} - ${d.name}`;
     selectedDefect = d.code;
@@ -348,57 +339,22 @@
     checkInput();
   }
 
-  /* ======== FILTER ON INPUT ======== */
   defectSearch.addEventListener('input', () => {
     const query = defectSearch.value.toLowerCase();
     const filtered = defects.filter(d =>
-      d.code.toLowerCase().includes(query) ||
-      d.name.toLowerCase().includes(query)
+      d.code.toLowerCase().includes(query) || d.name.toLowerCase().includes(query)
     );
     showList(filtered);
   });
 
-  /* ======== SHOW FULL LIST ON FOCUS ======== */
   defectSearch.addEventListener('focus', () => showList(defects));
-
-  /* ======== CLOSE DROPDOWN WHEN CLICK OUTSIDE ======== */
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('.custom-select-wrapper')) {
-      defectList.style.display = 'none';
-    }
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.custom-select-wrapper')) defectList.style.display = 'none';
   });
 
-  /* ======== KEYBOARD NAVIGATION ======== */
-  defectSearch.addEventListener('keydown', e => {
-    const items = defectList.querySelectorAll('.custom-select-item');
-    if (items.length === 0) return;
-
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      activeIndex = (activeIndex + 1) % items.length;
-      setActiveItem(items);
-    }
-    if (e.key === "ArrowUp") {
-      e.preventDefault();
-      activeIndex = (activeIndex - 1 + items.length) % items.length;
-      setActiveItem(items);
-    }
-    if (e.key === "Enter") {
-      e.preventDefault();
-      if (activeIndex >= 0) selectDefect(defects[activeIndex]);
-    }
-  });
-
-  function setActiveItem(items) {
-    items.forEach(i => i.classList.remove('active'));
-    if (activeIndex >= 0) items[activeIndex].classList.add('active');
-  }
-
-  /* ======== SERIAL INPUT & BUTTONS ======== */
   const serialInput = document.getElementById("serial_no");
   const saveBtn = document.getElementById("saveBtn");
   const resetBtn = document.getElementById("resetBtn");
-
   const errorCard = document.getElementById("errorCard");
   const errorListDiv = document.getElementById("genericErrorList");
   const collapseBtn = document.querySelector(".collapse-btn");
@@ -414,36 +370,8 @@
 
   serialInput.addEventListener("input", checkInput);
 
-  /* ======== FORM SUBMISSION ======== */
-  document.getElementById("serialForm").addEventListener("submit", function(e) {
+  document.getElementById("serialForm").addEventListener("submit", async function(e) {
     e.preventDefault();
-    submitSerial();
-  });
-
-  resetBtn.addEventListener("click", function() {
-    serialInput.value = "";
-    defectSearch.value = "";
-    selectedDefect = null;
-    saveBtn.disabled = true;
-    resetBtn.disabled = true;
-    hideCard();
-  });
-
-  closeBtn.addEventListener("click", hideCard);
-
-  collapseBtn.addEventListener("click", function() {
-    const collapsed = errorContent.classList.toggle("collapsed");
-    collapseBtn.textContent = collapsed ? "+" : "-";
-  });
-
-  /* ======== HIDE ERROR CARD ======== */
-  function hideCard() {
-    errorCard.classList.remove("show");
-    setTimeout(() => errorCard.style.display = "none", 400);
-  }
-
-  /* ======== SUBMIT SERIAL NUMBER ======== */
-  async function submitSerial() {
     if (!selectedDefect) {
       showError("Please select a defect from the list.");
       return;
@@ -451,23 +379,22 @@
 
     saveBtn.disabled = true;
     resetBtn.disabled = true;
-
     const originalText = saveBtn.innerHTML;
     saveBtn.innerHTML = `<span class="spinner"></span> Submitting...`;
 
     const formData = new FormData();
     formData.append("serial_no", serialInput.value.trim());
     formData.append("defect_code", selectedDefect);
+    formData.append("country", "All");
+    formData.append("judgement", "Pass");
 
     try {
       const r = await fetch("<?= site_url('ag/qcgibson/saveSerial'); ?>", {
         method: "POST",
         body: formData
       });
-
       const txt = await r.text();
       let result;
-
       try {
         result = JSON.parse(txt.trim());
       } catch {
@@ -480,38 +407,49 @@
       } else if (result.status === "success") {
         showSuccess(result.message);
         serialInput.value = "";
-        defectSearch.value = "";
-        selectedDefect = null;
+        defectSearch.value = "No Defect";
+        selectedDefect = "No Defect";
       } else {
         showError("Unknown server response.");
       }
-
-    } catch (err) {
+    } catch {
       showError("Network error or server unreachable.");
     } finally {
       saveBtn.innerHTML = originalText;
       checkInput();
     }
+  });
+
+  resetBtn.addEventListener("click", () => {
+    serialInput.value = "";
+    defectSearch.value = "No Defect";
+    selectedDefect = "No Defect";
+    saveBtn.disabled = true;
+    resetBtn.disabled = true;
+    hideCard();
+  });
+
+  closeBtn.addEventListener("click", hideCard);
+  collapseBtn.addEventListener("click", () => {
+    const collapsed = errorContent.classList.toggle("collapsed");
+    collapseBtn.textContent = collapsed ? "+" : "-";
+  });
+
+  function hideCard() {
+    errorCard.classList.remove("show");
+    setTimeout(() => errorCard.style.display = "none", 400);
   }
 
-  /* ======== ERROR & SUCCESS FUNCTIONS ======== */
   function showError(message, groups = []) {
     errorTitle.textContent = "Error!";
     errorTitle.style.color = "red";
     collapseBtn.style.display = "inline-block";
     closeBtn.style.display = "none";
-
     errorListDiv.innerHTML = "";
-
     if (groups.length > 0) {
       groups.forEach(g => {
         if (g.title && g.items) {
-          errorListDiv.innerHTML += `
-          <div class="error-title">${g.title}</div>
-          <div class="error-list">
-            ${g.items.map(i => `<p>${i}</p>`).join("")}
-          </div>
-        `;
+          errorListDiv.innerHTML += `<div class="error-title">${g.title}</div><div class="error-list">${g.items.map(i=>`<p>${i}</p>`).join("")}</div>`;
         } else {
           errorListDiv.innerHTML += `<p>${g}</p>`;
         }
@@ -519,7 +457,6 @@
     } else {
       errorListDiv.innerHTML = `<p>${message}</p>`;
     }
-
     errorCard.style.display = "block";
     setTimeout(() => errorCard.classList.add("show"), 10);
   }
@@ -529,12 +466,9 @@
     errorTitle.style.color = "green";
     collapseBtn.style.display = "none";
     closeBtn.style.display = "inline-block";
-
     errorListDiv.innerHTML = `<p style="color:black;">${message}</p>`;
-
     errorCard.style.display = "block";
     setTimeout(() => errorCard.classList.add("show"), 10);
-
     setTimeout(hideCard, 5000);
   }
 </script>
