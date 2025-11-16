@@ -45,8 +45,7 @@
     font-size: 16px;
   }
 
-  input[type="text"],
-  select {
+  input[type="text"] {
     width: 100%;
     padding: 7px 10px;
     border: 1px solid #d9d9d9;
@@ -56,12 +55,11 @@
     font-size: 16px;
   }
 
-  select:focus {
+  input:focus {
     outline: none;
     border-color: #bfbfbf;
     box-shadow: none;
   }
-
 
   .btn-group {
     margin-top: 15px;
@@ -212,12 +210,9 @@
     }
   }
 
-  input:focus {
-    outline: none;
-    border-color: #bfbfbf;
-    box-shadow: none;
-  }
-
+  /* ==========================
+   CUSTOM SELECT STYLING
+   ========================== */
   .custom-select-wrapper {
     position: relative;
     margin-bottom: 4px;
@@ -251,7 +246,8 @@
     cursor: pointer;
   }
 
-  .custom-select-item:hover {
+  .custom-select-item:hover,
+  .custom-select-item.active {
     background: #f0f0f0;
   }
 </style>
@@ -305,6 +301,7 @@
 </div>
 
 <script>
+  /* ======== DEFECT DATA ======== */
   const defects = [
     <?php foreach ($defects as $d): ?> {
         code: "<?= $d['defect_code'] ?>",
@@ -316,28 +313,42 @@
   const defectSearch = document.getElementById('defectSearch');
   const defectList = document.getElementById('defectList');
   let selectedDefect = null;
+  let activeIndex = -1; // for keyboard navigation
 
+  /* ======== SHOW DROPDOWN ======== */
   function showList(filtered) {
     defectList.innerHTML = '';
+    activeIndex = -1; // reset active index
+
     if (filtered.length === 0) {
       defectList.style.display = 'none';
       return;
     }
+
     filtered.forEach(d => {
       const div = document.createElement('div');
       div.classList.add('custom-select-item');
       div.textContent = `${d.code} - ${d.name}`;
+
       div.addEventListener('click', () => {
-        defectSearch.value = `${d.code} - ${d.name}`;
-        selectedDefect = d.code;
-        defectList.style.display = 'none';
-        checkInput();
+        selectDefect(d);
       });
+
       defectList.appendChild(div);
     });
+
     defectList.style.display = 'block';
   }
 
+  /* ======== SELECT DEFECT ======== */
+  function selectDefect(d) {
+    defectSearch.value = `${d.code} - ${d.name}`;
+    selectedDefect = d.code;
+    defectList.style.display = 'none';
+    checkInput();
+  }
+
+  /* ======== FILTER ON INPUT ======== */
   defectSearch.addEventListener('input', () => {
     const query = defectSearch.value.toLowerCase();
     const filtered = defects.filter(d =>
@@ -347,13 +358,43 @@
     showList(filtered);
   });
 
+  /* ======== SHOW FULL LIST ON FOCUS ======== */
+  defectSearch.addEventListener('focus', () => showList(defects));
+
+  /* ======== CLOSE DROPDOWN WHEN CLICK OUTSIDE ======== */
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.custom-select-wrapper')) {
       defectList.style.display = 'none';
     }
   });
 
-  // 
+  /* ======== KEYBOARD NAVIGATION ======== */
+  defectSearch.addEventListener('keydown', e => {
+    const items = defectList.querySelectorAll('.custom-select-item');
+    if (items.length === 0) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      activeIndex = (activeIndex + 1) % items.length;
+      setActiveItem(items);
+    }
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      activeIndex = (activeIndex - 1 + items.length) % items.length;
+      setActiveItem(items);
+    }
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (activeIndex >= 0) selectDefect(defects[activeIndex]);
+    }
+  });
+
+  function setActiveItem(items) {
+    items.forEach(i => i.classList.remove('active'));
+    if (activeIndex >= 0) items[activeIndex].classList.add('active');
+  }
+
+  /* ======== SERIAL INPUT & BUTTONS ======== */
   const serialInput = document.getElementById("serial_no");
   const saveBtn = document.getElementById("saveBtn");
   const resetBtn = document.getElementById("resetBtn");
@@ -365,7 +406,6 @@
   const errorTitle = document.getElementById("errorTitle");
   const errorContent = document.querySelector(".error-content");
 
-
   function checkInput() {
     const hasValue = serialInput.value.trim() !== "";
     saveBtn.disabled = !hasValue;
@@ -374,6 +414,7 @@
 
   serialInput.addEventListener("input", checkInput);
 
+  /* ======== FORM SUBMISSION ======== */
   document.getElementById("serialForm").addEventListener("submit", function(e) {
     e.preventDefault();
     submitSerial();
@@ -381,6 +422,8 @@
 
   resetBtn.addEventListener("click", function() {
     serialInput.value = "";
+    defectSearch.value = "";
+    selectedDefect = null;
     saveBtn.disabled = true;
     resetBtn.disabled = true;
     hideCard();
@@ -393,12 +436,19 @@
     collapseBtn.textContent = collapsed ? "+" : "-";
   });
 
+  /* ======== HIDE ERROR CARD ======== */
   function hideCard() {
     errorCard.classList.remove("show");
     setTimeout(() => errorCard.style.display = "none", 400);
   }
 
+  /* ======== SUBMIT SERIAL NUMBER ======== */
   async function submitSerial() {
+    if (!selectedDefect) {
+      showError("Please select a defect from the list.");
+      return;
+    }
+
     saveBtn.disabled = true;
     resetBtn.disabled = true;
 
@@ -407,6 +457,7 @@
 
     const formData = new FormData();
     formData.append("serial_no", serialInput.value.trim());
+    formData.append("defect_code", selectedDefect);
 
     try {
       const r = await fetch("<?= site_url('ag/qcgibson/saveSerial'); ?>", {
@@ -429,6 +480,8 @@
       } else if (result.status === "success") {
         showSuccess(result.message);
         serialInput.value = "";
+        defectSearch.value = "";
+        selectedDefect = null;
       } else {
         showError("Unknown server response.");
       }
@@ -441,6 +494,7 @@
     }
   }
 
+  /* ======== ERROR & SUCCESS FUNCTIONS ======== */
   function showError(message, groups = []) {
     errorTitle.textContent = "Error!";
     errorTitle.style.color = "red";
@@ -453,11 +507,11 @@
       groups.forEach(g => {
         if (g.title && g.items) {
           errorListDiv.innerHTML += `
-                        <div class="error-title">${g.title}</div>
-                        <div class="error-list">
-                            ${g.items.map(i => `<p>${i}</p>`).join("")}
-                        </div>
-                    `;
+          <div class="error-title">${g.title}</div>
+          <div class="error-list">
+            ${g.items.map(i => `<p>${i}</p>`).join("")}
+          </div>
+        `;
         } else {
           errorListDiv.innerHTML += `<p>${g}</p>`;
         }
