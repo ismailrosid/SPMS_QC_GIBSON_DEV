@@ -39,22 +39,26 @@ class QcGibson extends Controller
         $this->sUploadPath = APPPATH . 'docs/' . date('Ymd') . '/';
         $this->aDivision   = $this->config->item('division');
     }
-
     function masterdefect()
     {
+        // Load all defect categories from model
+        $aCategoryDefects = $this->Qc_gibson_model->get_all_category_defect();
+
         $aDisplay = array(
             'baseurl'          => base_url(),
             'basesiteurl'      => site_url(),
             'siteurl'          => site_url() . '/ag/qcgibson/',
             'PAGE_TITLE'       => 'SPMS-G. Master Code Defect',
             'sGlobalUserName'  => $this->sUsername,
-            'sGlobalUserLevel' => $this->sLevel
+            'sGlobalUserLevel' => $this->sLevel,
+            'category_defects' => $aCategoryDefects  // pass to view
         );
 
         $this->parser->parse('header', $aDisplay);
         $this->parser->parse('ag/qcgibson/masterdefect', $aDisplay);
         $this->parser->parse('footer', $aDisplay);
     }
+
 
     function scan()
     {

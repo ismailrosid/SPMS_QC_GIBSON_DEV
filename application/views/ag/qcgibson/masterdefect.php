@@ -244,10 +244,12 @@
                     <label>Category <span style="color:red">*</span></label>
                     <select id="category_code" required>
                         <option value="">-- Select Category --</option>
-                        <option value="CAT001">CAT001 - Mechanical</option>
-                        <option value="CAT002">CAT002 - Electrical</option>
-                        <option value="CAT003">CAT003 - Visual</option>
+                        <?php
+                        foreach ($category_defects as $aCat) { ?>
+                            <option value="<?= $aCat['category_code']; ?>"><?= $aCat['category_code']; ?> - <?= $aCat['category_name']; ?></option>
+                        <?php } ?>
                     </select>
+
 
                     <label style="margin-top:15px;">Defect Code <span style="color:red">*</span></label>
                     <input type="text" id="defect_code" placeholder="Enter defect code..." required />
