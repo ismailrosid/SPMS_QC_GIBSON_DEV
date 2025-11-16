@@ -56,11 +56,31 @@
         font-size: 16px;
     }
 
-    input:focus,
-    select:focus {
-        outline: none;
-        border-color: #bfbfbf;
-        box-shadow: none;
+    .btn-group {
+        margin-top: 15px;
+        text-align: right;
+    }
+
+    button {
+        padding: 6px 14px;
+        border: 1px solid #d9d9d9;
+        background: #f2f2f2;
+        cursor: pointer;
+        font-weight: bold;
+        color: #555;
+        margin-left: 6px;
+        border-radius: 4px;
+        transition: 0.2s;
+        font-size: 16px;
+    }
+
+    button:hover:not(:disabled) {
+        background: #e6e6e6;
+    }
+
+    button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
     }
 
     /* ==========================
@@ -143,6 +163,20 @@
         display: none;
     }
 
+    .error-group {
+        margin-bottom: 18px;
+    }
+
+    .error-title {
+        display: inline-block;
+        background-color: #ddd;
+        padding: 3px 8px;
+        font-weight: bold;
+        color: #000000ce;
+        margin-bottom: 6px;
+        font-size: 16px;
+    }
+
     .error-container {
         margin-left: 0px;
         color: red;
@@ -170,206 +204,213 @@
             transform: rotate(360deg);
         }
     }
+
+    input:focus,
+    select:focus {
+        outline: none;
+        border-color: #bfbfbf;
+        box-shadow: none;
+    }
 </style>
 
 
-<body>
-    <div class="card-form">
-        <div class="card-form-section">
-            <div class="card-form-section-header"><span>Add Defect Code</span></div>
+<div class="card-form">
+    <div class="card-form-section">
+        <div class="card-form-section-header"><span>Add Defect Code</span></div>
 
-            <div class="card-form-section-body">
+        <div class="card-form-section-body">
 
-                <!-- ERROR CARD -->
-                <div class="error-card" id="errorCard">
-                    <div class="error-header">
-                        <div class="error-header-left">
-                            <h2 id="errorTitle">Error!</h2>
-                        </div>
-                        <div class="error-controls">
-                            <button class="error-btn collapse-btn">-</button>
-                            <button class="error-btn close-btn">X</button>
-                        </div>
+            <!-- ERROR CARD -->
+            <div class="error-card" id="errorCard">
+                <div class="error-header">
+                    <div class="error-header-left">
+                        <h2 id="errorTitle">Error!</h2>
                     </div>
-                    <hr />
-                    <div class="error-content">
-                        <div class="error-group">
-                            <div class="error-container" id="genericErrorList"></div>
-                        </div>
+                    <div class="error-controls">
+                        <button class="error-btn collapse-btn">-</button>
+                        <button class="error-btn close-btn">X</button>
                     </div>
                 </div>
-
-                <!-- FORM DEFECT CODE -->
-                <form id="defectForm">
-                    <label>Category <span style="color:red">*</span></label>
-                    <select id="category_code" required>
-                        <option value="">-- Select Category --</option>
-                        <?php
-                        foreach ($category_defects as $aCat) { ?>
-                            <option value="<?= $aCat['category_code']; ?>"><?= $aCat['category_code']; ?> - <?= $aCat['category_name']; ?></option>
-                        <?php } ?>
-                    </select>
-
-
-                    <label style="margin-top:15px;">Defect Code <span style="color:red">*</span></label>
-                    <input type="text" id="defect_code" placeholder="Enter defect code..." required />
-
-                    <label style="margin-top:15px;">Defect Name <span style="color:red">*</span></label>
-                    <input type="text" id="defect_name" placeholder="Enter defect name..." required />
-
-                    <div class="btn-group">
-                        <button type="reset" id="resetBtn" disabled>Reset</button>
-                        <button type="submit" id="saveBtn" disabled>Save</button>
+                <hr />
+                <div class="error-content">
+                    <div class="error-group">
+                        <div class="error-container" id="genericErrorList"></div>
                     </div>
-                </form>
+                </div>
             </div>
+
+            <!-- FORM DEFECT CODE -->
+            <form id="defectForm">
+                <label>Category <span style="color:red">*</span></label>
+
+                <select id="category_code" required>
+                    <option value="">-- Select Category --</option>
+                    <?php
+                    foreach ($category_defects as $aCat) { ?>
+                        <option value="<?= $aCat['category_code']; ?>"><?= $aCat['category_code']; ?> - <?= $aCat['category_name']; ?></option>
+                    <?php } ?>
+                </select>
+
+
+                <label style="margin-top:15px;">Defect Code <span style="color:red">*</span></label>
+                <input type="text" id="defect_code" placeholder="Enter defect code..." required />
+
+                <label style="margin-top:15px;">Defect Name <span style="color:red">*</span></label>
+                <input type="text" id="defect_name" placeholder="Enter defect name..." required />
+
+                <div class="btn-group">
+                    <button type="reset" id="resetBtn" disabled>Reset</button>
+                    <button type="submit" id="saveBtn" disabled>Save</button>
+                </div>
+            </form>
         </div>
     </div>
+</div>
 
-    <script>
-        const category = document.getElementById("category_code");
-        const defectCode = document.getElementById("defect_code");
-        const defectName = document.getElementById("defect_name");
+<script>
+    const category = document.getElementById("category_code");
+    const defectCode = document.getElementById("defect_code");
+    const defectName = document.getElementById("defect_name");
 
-        const saveBtn = document.getElementById("saveBtn");
-        const resetBtn = document.getElementById("resetBtn");
+    const saveBtn = document.getElementById("saveBtn");
+    const resetBtn = document.getElementById("resetBtn");
 
-        const errorCard = document.getElementById("errorCard");
-        const errorListDiv = document.getElementById("genericErrorList");
-        const collapseBtn = document.querySelector(".collapse-btn");
-        const closeBtn = document.querySelector(".close-btn");
-        const errorTitle = document.getElementById("errorTitle");
-        const errorContent = document.querySelector(".error-content");
+    const errorCard = document.getElementById("errorCard");
+    const errorListDiv = document.getElementById("genericErrorList");
+    const collapseBtn = document.querySelector(".collapse-btn");
+    const closeBtn = document.querySelector(".close-btn");
+    const errorTitle = document.getElementById("errorTitle");
+    const errorContent = document.querySelector(".error-content");
 
-        function checkInput() {
-            const isCategoryFilled = category.value.trim() !== "";
-            const isDefectCodeFilled = defectCode.value.trim() !== "";
-            const isDefectNameFilled = defectName.value.trim() !== "";
+    function checkInput() {
+        const isCategoryFilled = category.value.trim() !== "";
+        const isDefectCodeFilled = defectCode.value.trim() !== "";
+        const isDefectNameFilled = defectName.value.trim() !== "";
 
-            // Save hanya aktif jika semua field diisi
-            saveBtn.disabled = !(isCategoryFilled && isDefectCodeFilled && isDefectNameFilled);
+        // Save hanya aktif jika semua field diisi
+        saveBtn.disabled = !(isCategoryFilled && isDefectCodeFilled && isDefectNameFilled);
 
-            // Reset aktif jika minimal satu field diisi
-            resetBtn.disabled = !(isCategoryFilled || isDefectCodeFilled || isDefectNameFilled);
-        }
+        // Reset aktif jika minimal satu field diisi
+        resetBtn.disabled = !(isCategoryFilled || isDefectCodeFilled || isDefectNameFilled);
+    }
 
-        category.addEventListener("change", checkInput);
-        defectCode.addEventListener("input", checkInput);
-        defectName.addEventListener("input", checkInput);
+    category.addEventListener("change", checkInput);
+    defectCode.addEventListener("input", checkInput);
+    defectName.addEventListener("input", checkInput);
 
-        document.getElementById("defectForm").addEventListener("submit", function(e) {
-            e.preventDefault();
-            submitDefect();
-        });
+    document.getElementById("defectForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+        submitDefect();
+    });
 
-        resetBtn.addEventListener("click", function() {
-            category.value = "";
-            defectCode.value = "";
-            defectName.value = "";
-            saveBtn.disabled = true;
-            resetBtn.disabled = true;
-            hideCard();
-        });
+    resetBtn.addEventListener("click", function() {
+        category.value = "";
+        defectCode.value = "";
+        defectName.value = "";
+        saveBtn.disabled = true;
+        resetBtn.disabled = true;
+        hideCard();
+    });
 
-        closeBtn.addEventListener("click", hideCard);
+    closeBtn.addEventListener("click", hideCard);
 
-        collapseBtn.addEventListener("click", function() {
-            const collapsed = errorContent.classList.toggle("collapsed");
-            collapseBtn.textContent = collapsed ? "+" : "-";
-        });
+    collapseBtn.addEventListener("click", function() {
+        const collapsed = errorContent.classList.toggle("collapsed");
+        collapseBtn.textContent = collapsed ? "+" : "-";
+    });
 
-        function hideCard() {
-            errorCard.classList.remove("show");
-            setTimeout(() => errorCard.style.display = "none", 400);
-        }
+    function hideCard() {
+        errorCard.classList.remove("show");
+        setTimeout(() => errorCard.style.display = "none", 400);
+    }
 
-        async function submitDefect() {
-            saveBtn.disabled = true;
-            resetBtn.disabled = true;
+    async function submitDefect() {
+        saveBtn.disabled = true;
+        resetBtn.disabled = true;
 
-            const originalText = saveBtn.innerHTML;
-            saveBtn.innerHTML = `<span class="spinner"></span> Saving...`;
+        const originalText = saveBtn.innerHTML;
+        saveBtn.innerHTML = `<span class="spinner"></span> Saving...`;
 
-            const formData = new FormData();
-            formData.append("category_code", category.value.trim());
-            formData.append("defect_code", defectCode.value.trim());
-            formData.append("defect_name", defectName.value.trim());
+        const formData = new FormData();
+        formData.append("category_code", category.value.trim());
+        formData.append("defect_code", defectCode.value.trim());
+        formData.append("defect_name", defectName.value.trim());
+
+        try {
+            const r = await fetch("<?= site_url('ag/qcgibson/savedefect'); ?>", {
+                method: "POST",
+                body: formData
+            });
+
+            const txt = await r.text();
+            let result;
 
             try {
-                const r = await fetch("<?= site_url('ag/qcgibson/savedefect'); ?>", {
-                    method: "POST",
-                    body: formData
-                });
-
-                const txt = await r.text();
-                let result;
-
-                try {
-                    result = JSON.parse(txt.trim());
-                } catch {
-                    showError("Invalid server JSON");
-                    return;
-                }
-
-                if (result.status === "error") {
-                    showError(result.message, result.errors || []);
-                } else if (result.status === "success") {
-                    showSuccess(result.message);
-                    category.value = "";
-                    defectCode.value = "";
-                    defectName.value = "";
-                } else {
-                    showError("Unknown server response.");
-                }
-
-            } catch (err) {
-                showError("Network error or server unreachable.");
-            } finally {
-                saveBtn.innerHTML = originalText;
-                checkInput();
+                result = JSON.parse(txt.trim());
+            } catch {
+                showError("Invalid server JSON");
+                return;
             }
+
+            if (result.status === "error") {
+                showError(result.message, result.errors || []);
+            } else if (result.status === "success") {
+                showSuccess(result.message);
+                category.value = "";
+                defectCode.value = "";
+                defectName.value = "";
+            } else {
+                showError("Unknown server response.");
+            }
+
+        } catch (err) {
+            showError("Network error or server unreachable.");
+        } finally {
+            saveBtn.innerHTML = originalText;
+            checkInput();
         }
+    }
 
-        function showError(message, groups = []) {
-            errorTitle.textContent = "Error!";
-            errorTitle.style.color = "red";
-            collapseBtn.style.display = "inline-block";
-            closeBtn.style.display = "none";
+    function showError(message, groups = []) {
+        errorTitle.textContent = "Error!";
+        errorTitle.style.color = "red";
+        collapseBtn.style.display = "inline-block";
+        closeBtn.style.display = "none";
 
-            errorListDiv.innerHTML = "";
+        errorListDiv.innerHTML = "";
 
-            if (groups.length > 0) {
-                groups.forEach(g => {
-                    if (g.title && g.items) {
-                        errorListDiv.innerHTML += `
+        if (groups.length > 0) {
+            groups.forEach(g => {
+                if (g.title && g.items) {
+                    errorListDiv.innerHTML += `
                         <div class="error-title">${g.title}</div>
                         <div class="error-list">
                             ${g.items.map(i => `<p>${i}</p>`).join("")}
                         </div>
                     `;
-                    } else {
-                        errorListDiv.innerHTML += `<p>${g}</p>`;
-                    }
-                });
-            } else {
-                errorListDiv.innerHTML = `<p>${message}</p>`;
-            }
-
-            errorCard.style.display = "block";
-            setTimeout(() => errorCard.classList.add("show"), 10);
+                } else {
+                    errorListDiv.innerHTML += `<p>${g}</p>`;
+                }
+            });
+        } else {
+            errorListDiv.innerHTML = `<p>${message}</p>`;
         }
 
-        function showSuccess(message) {
-            errorTitle.textContent = "Success!";
-            errorTitle.style.color = "green";
-            collapseBtn.style.display = "none";
-            closeBtn.style.display = "inline-block";
+        errorCard.style.display = "block";
+        setTimeout(() => errorCard.classList.add("show"), 10);
+    }
 
-            errorListDiv.innerHTML = `<p style="color:black;">${message}</p>`;
+    function showSuccess(message) {
+        errorTitle.textContent = "Success!";
+        errorTitle.style.color = "green";
+        collapseBtn.style.display = "none";
+        closeBtn.style.display = "inline-block";
 
-            errorCard.style.display = "block";
-            setTimeout(() => errorCard.classList.add("show"), 10);
+        errorListDiv.innerHTML = `<p style="color:black;">${message}</p>`;
 
-            setTimeout(hideCard, 5000);
-        }
-    </script>
+        errorCard.style.display = "block";
+        setTimeout(() => errorCard.classList.add("show"), 10);
+
+        setTimeout(hideCard, 5000);
+    }
+</script>
