@@ -152,4 +152,23 @@ class Qc_gibson_model extends Model
         $this->db->where('defect_code', strtoupper(trim($defectCode)));
         return $this->db->update('tgibson_defect_code') !== FALSE;
     }
+
+    /**
+     * Retrieve defects from tgibson_defect_code
+     */
+    function get_defect($defectCode = null)
+    {
+        $this->db->select('sysid, defect_code, defect_name, category_code');
+        $this->db->from('tgibson_defect_code');
+
+        if ($defectCode !== null) {
+            $this->db->where('defect_code', strtoupper(trim($defectCode)));
+            $query = $this->db->get();
+            return $query->row_array(); // return single row
+        }
+
+        $this->db->order_by('defect_code', 'ASC');
+        $query = $this->db->get();
+        return $query->result_array(); // return all rows
+    }
 }

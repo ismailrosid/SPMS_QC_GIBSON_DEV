@@ -238,7 +238,19 @@
 
       <!-- FORM SERIAL NUMBER -->
       <form id="serialForm">
-        <label>Serial Number <span style="color:red">*</span></label>
+        <!-- DEFECT CODE -->
+        <label>Defect Code <span style="color:red">*</span></label>
+        <select id="defect_code" name="defect_code" required>
+          <option value="">-- Select Defect --</option>
+          <?php foreach ($defects as $d): ?>
+            <option value="<?= $d['defect_code'] ?>">
+              <?= $d['defect_code'] ?> - <?= $d['defect_name'] ?>
+            </option>
+          <?php endforeach; ?>
+        </select>
+
+        <!-- SERIAL NUMBER -->
+        <label style="margin-top:15px;">Serial Number <span style="color:red">*</span></label>
         <input type="text" id="serial_no" name="serial_no" placeholder="Scan or type serial number..." required />
 
         <div class="btn-group">
@@ -246,6 +258,7 @@
           <button type="submit" id="saveBtn" disabled>Submit</button>
         </div>
       </form>
+
     </div>
   </div>
 </div>
