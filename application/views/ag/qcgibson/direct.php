@@ -243,7 +243,7 @@
         <!-- DEFECT CODE SELECT -->
         <label>Defect Code <span style="color:red">*</span></label>
         <select id="defectSelect" name="defect_code" required>
-          <option value="NULL" selected disabled>No Defect</option>
+          <option value="NULL" selected>No Defect</option>
           <?php foreach ($defects as $d): ?>
             <option value="<?= $d['defect_code'] ?>"><?= $d['defect_code'] ?> - <?= $d['defect_name'] ?></option>
           <?php endforeach; ?>
