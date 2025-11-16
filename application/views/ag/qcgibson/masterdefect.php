@@ -74,7 +74,7 @@
         font-size: 16px;
     }
 
-    button:hover {
+    button:hover:not(:disabled) {
         background: #e6e6e6;
     }
 
@@ -214,7 +214,6 @@
 </style>
 
 <body>
-
     <div class="card-form">
         <div class="card-form-section">
             <div class="card-form-section-header"><span>Add Defect Code</span></div>
@@ -240,11 +239,8 @@
                     </div>
                 </div>
 
-                <!-- ==========================
-                 FORM DEFECT CODE
-            ========================== -->
+                <!-- FORM DEFECT CODE -->
                 <form id="defectForm">
-
                     <label>Category <span style="color:red">*</span></label>
                     <select id="category_code" required>
                         <option value="">-- Select Category --</option>
@@ -263,9 +259,7 @@
                         <button type="reset" id="resetBtn" disabled>Reset</button>
                         <button type="submit" id="saveBtn" disabled>Save</button>
                     </div>
-
                 </form>
-
             </div>
         </div>
     </div>
@@ -286,13 +280,15 @@
         const errorContent = document.querySelector(".error-content");
 
         function checkInput() {
-            const ok =
-                category.value.trim() !== "" &&
-                defectCode.value.trim() !== "" &&
-                defectName.value.trim() !== "";
+            const isCategoryFilled = category.value.trim() !== "";
+            const isDefectCodeFilled = defectCode.value.trim() !== "";
+            const isDefectNameFilled = defectName.value.trim() !== "";
 
-            saveBtn.disabled = !ok;
-            resetBtn.disabled = !ok;
+            // Save hanya aktif jika semua field diisi
+            saveBtn.disabled = !(isCategoryFilled && isDefectCodeFilled && isDefectNameFilled);
+
+            // Reset aktif jika minimal satu field diisi
+            resetBtn.disabled = !(isCategoryFilled || isDefectCodeFilled || isDefectNameFilled);
         }
 
         category.addEventListener("change", checkInput);
