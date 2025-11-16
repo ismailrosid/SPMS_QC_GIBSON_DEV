@@ -59,6 +59,79 @@ class QcGibson extends Controller
         $this->parser->parse('footer', $aDisplay);
     }
 
+    function savedefect()
+    {
+        header('Content-Type: application/json');
+
+        // Get input values from POST
+        $categoryCode = trim($this->input->post('category_code', true));
+        $defectCode   = trim($this->input->post('defect_code', true));
+        $defectName   = trim($this->input->post('defect_name', true));
+
+        $errorGroups = array();
+
+        // Validate required fields
+        if (empty($categoryCode)) $errorGroups[] = 'Category must be selected.';
+        if (empty($defectCode))   $errorGroups[] = 'Defect code cannot be empty.';
+        if (empty($defectName))   $errorGroups[] = 'Defect name cannot be empty.';
+
+        if (!empty($errorGroups)) {
+            echo json_encode(array(
+                'status' => 'error',
+                'message' => 'Please correct the following errors:',
+                'errors'  => $errorGroups,
+                'success' => array()
+            ));
+            exit();
+        }
+
+        // Prepare data array for insert/update
+        $aData = array(
+            'category_code' => $categoryCode,
+            'defect_code'   => $defectCode,
+            'defect_name'   => $defectName,
+            'created_by'    => $this->sUsername,
+            'created_at'    => date('Y-m-d H:i:s')
+        );
+
+        // Start database transaction
+        $this->db->trans_start();
+
+        // Check if defect code already exists
+        $exists = $this->Qc_gibson_model->get_defect_by_code($defectCode);
+
+        if ($exists) {
+            $rSave = $this->Qc_gibson_model->update_defect($defectCode, $aData);
+            $action = 'updated';
+        } else {
+            $rSave = $this->Qc_gibson_model->insert_defect($aData);
+            $action = 'saved';
+        }
+
+        if (!$rSave) {
+            $this->db->trans_rollback();
+            echo json_encode(array(
+                'status' => 'error',
+                'message' => 'Failed to ' . $action . ' defect code.',
+                'errors'  => array(),
+                'success' => array()
+            ));
+            exit();
+        }
+
+        // Commit transaction
+        $this->db->trans_complete();
+
+        // Return success response
+        echo json_encode(array(
+            'status'  => 'success',
+            'message' => 'The defect code has been successfully ' . $action . '!',
+            'errors'  => array(),
+            'success' => array($defectCode)
+        ));
+        exit();
+    }
+
 
     function scan()
     {

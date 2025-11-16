@@ -267,113 +267,136 @@
 </div>
 
 <script>
-  const form = document.getElementById("directForm");
-  const serialInput = document.getElementById("serial_no");
-  const submitBtn = document.getElementById("submitBtn");
+  const form = document.getElementById("defectForm");
+  const category = document.getElementById("category_code");
+  const defectCode = document.getElementById("defect_code");
+  const defectName = document.getElementById("defect_name");
+  const saveBtn = document.getElementById("saveBtn");
+  const resetBtn = document.getElementById("resetBtn");
+
   const errorCard = document.getElementById("errorCard");
   const errorListDiv = document.getElementById("genericErrorList");
   const closeBtn = document.querySelector(".close-btn");
-  const scanContainer = document.getElementById("scanContainer");
-  submitBtn.disabled = true;
+  const collapseBtn = document.querySelector(".collapse-btn");
 
-  function updateSubmitState() {
-    submitBtn.disabled = !serialInput.value.trim();
+  // Initial button state
+  saveBtn.disabled = true;
+  resetBtn.disabled = true;
+
+  function checkInput() {
+    const isCategoryFilled = category.value.trim() !== "";
+    const isDefectCodeFilled = defectCode.value.trim() !== "";
+    const isDefectNameFilled = defectName.value.trim() !== "";
+
+    saveBtn.disabled = !(isCategoryFilled && isDefectCodeFilled && isDefectNameFilled);
+    resetBtn.disabled = !(isCategoryFilled || isDefectCodeFilled || isDefectNameFilled);
   }
 
-  scanContainer.addEventListener("click", () => {
-    scanContainer.classList.add("active");
-    scanContainer.focus();
-    refreshDisplay();
+  category.addEventListener("change", checkInput);
+  defectCode.addEventListener("input", checkInput);
+  defectName.addEventListener("input", checkInput);
+
+  resetBtn.addEventListener("click", () => {
+    category.value = "";
+    defectCode.value = "";
+    defectName.value = "";
+    checkInput();
+    hideCard();
   });
 
-  scanContainer.addEventListener("blur", () => {
-    if (!serialInput.value.trim()) scanContainer.classList.remove("active");
-    refreshDisplay();
+  collapseBtn.addEventListener("click", () => {
+    const errorContent = document.querySelector(".error-content");
+    const collapsed = errorContent.classList.toggle("collapsed");
+    collapseBtn.textContent = collapsed ? "+" : "-";
   });
 
-  scanContainer.addEventListener("keydown", (e) => {
-    if (e.key === "Backspace") {
-      serialInput.value = serialInput.value.slice(0, -1);
-    } else if (e.key.length === 1) {
-      serialInput.value += e.key.toUpperCase();
-    }
+  closeBtn.addEventListener("click", hideCard);
 
-    refreshDisplay();
-    updateSubmitState();
-  });
-
-  scanContainer.addEventListener("paste", (e) => {
-    e.preventDefault();
-    const pasteText = (e.clipboardData || window.clipboardData).getData("text").trim();
-    if (pasteText) {
-      serialInput.value = pasteText.toUpperCase();
-      scanContainer.classList.add("active");
-    }
-    refreshDisplay();
-    updateSubmitState();
-  });
-
-  function refreshDisplay() {
-    if (!serialInput.value.trim()) {
-      scanContainer.innerHTML = "Scan or type serial number here";
-      return;
-    }
-
-    scanContainer.innerHTML =
-      serialInput.value.toUpperCase() + `<span class="cursor-blink"></span>`;
+  function hideCard() {
+    errorCard.classList.remove("show");
+    setTimeout(() => errorCard.style.display = "none", 400);
   }
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const serialNo = serialInput.value.trim();
-    if (!serialNo) return;
+    const catVal = category.value.trim();
+    const codeVal = defectCode.value.trim();
+    const nameVal = defectName.value.trim();
 
-    submitBtn.disabled = true;
-    const originalText = submitBtn.innerHTML;
-    submitBtn.innerHTML = `<span class="spinner"></span> Processing...`;
+    if (!catVal || !codeVal || !nameVal) return;
+
+    saveBtn.disabled = true;
+    resetBtn.disabled = true;
+    const originalText = saveBtn.innerHTML;
+    saveBtn.innerHTML = `<span class="spinner"></span> Saving...`;
+
+    const formData = new FormData();
+    formData.append("category_code", catVal);
+    formData.append("defect_code", codeVal);
+    formData.append("defect_name", nameVal);
 
     try {
-      const data = new FormData();
-      data.append("serial_no", serialNo);
-      const response = await fetch("<?= site_url('ag/qcgibson/savedirect'); ?>", {
+      const response = await fetch("<?= site_url('ag/qcgibson/savedefect'); ?>", {
         method: "POST",
-        body: data,
+        body: formData
       });
       const result = await response.json();
-      if (result.status === "success") showCard(result.message, "success");
-      else showCard(result.message, "error");
-    } catch {
+
+      if (result.status === "success") {
+        showCard(result.message, "success");
+        category.value = "";
+        defectCode.value = "";
+        defectName.value = "";
+      } else {
+        // result.status === "error"
+        const errors = result.errors || [];
+        if (errors.length > 0) {
+          let html = "";
+          errors.forEach(g => {
+            if (g.title && g.items) {
+              html += `<div class="error-title">${g.title}</div>`;
+              html += `<div class="error-list">${g.items.map(i=>`<p>${i}</p>`).join("")}</div>`;
+            } else {
+              html += `<p>${g}</p>`;
+            }
+          });
+          errorListDiv.innerHTML = html;
+        } else {
+          errorListDiv.innerHTML = `<p style="color:red;">${result.message}</p>`;
+        }
+        showCard("", "error"); // only show card, message already set
+      }
+
+    } catch (err) {
       showCard("Failed to connect to server.", "error");
     } finally {
-      submitBtn.innerHTML = originalText;
-      updateSubmitState();
+      saveBtn.innerHTML = originalText;
+      checkInput();
     }
   });
 
   function showCard(message, type) {
     const errorTitle = document.getElementById("errorTitle");
+    const errorContent = document.querySelector(".error-content");
+
     errorTitle.textContent = type === "success" ? "Success!" : "Error!";
-    errorTitle.style.color = type === "success" ? "black" : "red";
-    const textColor = type === "success" ? "green" : "red";
-    errorListDiv.innerHTML = `<p style="color:${textColor};">${message}</p>`;
+    errorTitle.style.color = type === "success" ? "green" : "red";
+
+    if (type === "success") {
+      errorListDiv.innerHTML = `<p style="color:black;">${message}</p>`;
+      collapseBtn.style.display = "none";
+      closeBtn.style.display = "inline-block";
+    } else {
+      collapseBtn.style.display = "inline-block";
+      closeBtn.style.display = "none";
+    }
+
     errorCard.style.display = "block";
     setTimeout(() => errorCard.classList.add("show"), 10);
 
-    // if (type === "success") {
-    //   serialInput.value = "";
-    //   scanContainer.innerHTML = "Scan or type serial number here";
-    //   scanContainer.classList.remove("active");
-    //   submitBtn.disabled = true;
-    // }
-
-    setTimeout(() => {
-      errorCard.classList.remove("show");
-      setTimeout(() => (errorCard.style.display = "none"), 400);
-    }, 5000);
+    // Auto-hide success after 5 sec
+    if (type === "success") {
+      setTimeout(hideCard, 5000);
+    }
   }
-
-  closeBtn.addEventListener("click", () => {
-    errorCard.classList.remove("show");
-    setTimeout(() => (errorCard.style.display = "none"), 400);
-  });
 </script>

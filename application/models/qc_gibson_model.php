@@ -125,4 +125,31 @@ class Qc_gibson_model extends Model
 
         return $query->row_array(); // Return single row
     }
+
+    /**
+     * Insert new defect
+     */
+    function insert_defect($aData)
+    {
+        foreach ($aData as $field => $value) {
+            if ($value === '') $this->db->set($field, 'NULL', FALSE);
+            else $this->db->set($field, $value);
+        }
+
+        return $this->db->insert('tgibson_defect_code') !== FALSE;
+    }
+
+    /**
+     * Update existing defect by defect code
+     */
+    function update_defect($defectCode, $aData)
+    {
+        foreach ($aData as $field => $value) {
+            if ($value === '') $this->db->set($field, 'NULL', FALSE);
+            else $this->db->set($field, $value);
+        }
+
+        $this->db->where('defect_code', strtoupper(trim($defectCode)));
+        return $this->db->update('tgibson_defect_code') !== FALSE;
+    }
 }
