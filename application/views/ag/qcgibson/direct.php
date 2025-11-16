@@ -1,70 +1,57 @@
 <style>
-  /* === MAIN CARD FORM === */
-  .card-form {
-    border-radius: 8px;
-    padding: 20px;
-    max-width: 600px;
-    margin: 40px auto;
-    font-family: Arial, sans-serif;
-    font-size: 18px;
-  }
-
-  .card-form-section {
-    background: #fafafa;
-    border: 1px solid #d9d9d9;
-    border-radius: 6px;
-    margin-bottom: 20px;
-    overflow: hidden;
-  }
-
-  .card-form-section-body {
-    position: relative;
-    padding: 20px;
-    background: #fff;
-    font-size: 17px;
-  }
-
-  label {
+  /* === CARD FORM INPUT STYLING === */
+  .card-form label {
     display: block;
     font-weight: bold;
     color: #333;
-    margin-bottom: 16px;
-    font-size: 24px;
+    margin-bottom: 8px;
+    font-size: 18px;
   }
 
   .required-star {
     color: red;
     margin-left: 4px;
-    font-weight: bold;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    font-size: 16px;
+    box-sizing: border-box;
+    margin-bottom: 12px;
+    transition: border 0.2s, box-shadow 0.2s;
+  }
+
+  input[type="text"]:focus {
+    outline: none;
+    border-color: #acd1f8ff;
+    box-shadow: 0 0 4px #acd1f8ff;
   }
 
   .scan-container {
     border: 2px dashed #d9d9d9;
-    border-radius: 8px;
+    border-radius: 6px;
     background: #f9f9f9;
-    min-height: 30px;
+    min-height: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 20px;
+    font-size: 16px;
     color: #555;
     cursor: text;
-    text-align: center;
     padding: 10px;
+    text-align: center;
     transition: all 0.25s ease-in-out;
-    position: relative;
   }
 
-  .scan-container.active,
-  .scan-container:focus {
+  .scan-container.active {
     border: 2px solid #acd1f8ff !important;
     background: #eef6ff;
-    outline: none;
   }
 
-  /* ===== CURSOR BLINK ===== */
-  /* ===== CURSOR BLINK ===== */
-  .scan-container.active .cursor-blink {
+  .scan-container .cursor-blink {
     width: 2px;
     height: 22px;
     background: #333;
@@ -75,30 +62,22 @@
   }
 
   @keyframes blinkCursor {
-    0% {
+
+    0%,
+    100% {
       opacity: 1;
     }
 
     50% {
       opacity: 0;
     }
-
-    100% {
-      opacity: 1;
-    }
   }
-
-  /* ========================= */
 
   #serial_no {
     display: none;
   }
 
-  .btn-group {
-    margin-top: 20px;
-    text-align: right;
-  }
-
+  /* === SUBMIT BUTTON === */
   #submitBtn {
     width: 100%;
     padding: 12px 0;
@@ -108,11 +87,11 @@
     font-weight: bold;
     color: #555;
     border-radius: 6px;
-    font-size: 18px;
+    font-size: 16px;
     transition: 0.2s;
   }
 
-  #submitBtn:hover {
+  #submitBtn:hover:not(:disabled) {
     background: #e6e6e6;
   }
 
@@ -121,14 +100,15 @@
     cursor: not-allowed;
   }
 
+  /* Spinner kecil */
   .spinner {
     display: inline-block;
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
     border: 2px solid #999;
     border-top-color: transparent;
     border-radius: 50%;
-    margin-right: 8px;
+    margin-right: 6px;
     animation: spin 0.8s linear infinite;
     vertical-align: middle;
   }
@@ -138,101 +118,8 @@
       transform: rotate(360deg);
     }
   }
-
-  .error-card {
-    position: relative;
-    background: #fff;
-    border: 1px solid #d9d9d9;
-    border-radius: 6px;
-    padding: 20px 25px;
-    margin-bottom: 20px;
-    display: none;
-    opacity: 0;
-    transform: translateY(-10px);
-    transition: opacity 0.4s ease, transform 0.4s ease;
-    font-size: 16px;
-    max-height: 300px;
-    overflow: hidden;
-    z-index: 5;
-  }
-
-  .error-card.show {
-    opacity: 1;
-    transform: translateY(0);
-    display: block;
-  }
-
-  .error-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .error-header-left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .error-card h2 {
-    font-size: 20px;
-    font-weight: bold;
-    margin: 0;
-  }
-
-  .error-controls {
-    display: flex;
-    gap: 6px;
-  }
-
-  .error-btn {
-    background: #fff;
-    border: 1px solid #d9d9d9;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 16px;
-    border-radius: 4px;
-    text-align: center;
-    line-height: 22px;
-  }
-
-  .error-btn:hover {
-    background: #e6e6e6;
-    color: #555;
-  }
-
-  .error-card hr {
-    border: none;
-    border-top: 1px solid #d9d9d9;
-    margin: 15px 0;
-  }
-
-  .error-content {
-    opacity: 1;
-    margin-top: 10px;
-  }
-
-  .error-container {
-    color: red;
-    font-size: 15px;
-    max-height: 200px;
-    overflow-y: auto;
-    padding-right: 5px;
-  }
-
-  .error-container::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  .error-container::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.3);
-    border-radius: 3px;
-  }
-
-  .error-container::-webkit-scrollbar-track {
-    background: transparent;
-  }
 </style>
+
 
 <div class="card-form">
   <div class="card-form-section">
