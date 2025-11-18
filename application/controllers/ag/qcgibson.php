@@ -150,7 +150,7 @@ class QcGibson extends Controller
         $this->parser->parse('footer', $aDisplay);
     }
 
-   
+
     function savedefect()
     {
         header('Content-Type: application/json');
@@ -276,110 +276,6 @@ class QcGibson extends Controller
         ));
         exit();
     }
-
-    function savedirect()
-    {
-        header('Content-Type: application/json');
-
-        // Get input values from POST
-        $serialNo   = trim($this->input->post('serial_no', true));
-        $defectCode = trim($this->input->post('defect_code', true));
-        $country    = trim($this->input->post('country', true));
-        $judgmentPost = trim($this->input->post('judgement', true));
-        $judgment = ($judgmentPost === "1") ? 'good' : 'nogood';
-
-        // Frontend double validation in backend
-        
-        if ($judgmentPost === "0" && ($defectCode === "NULL" || empty($defectCode))) {
-            echo json_encode(array(
-                'status' => 'error',
-                'message' => 'If Judgement is NOT PASS, please select a Defect Code.',
-                'errors' => array()
-            ));
-            exit();
-        }
-
-        if ($judgmentPost === "1" && $defectCode !== "NULL" && !empty($defectCode)) {
-            echo json_encode(array(
-                'status' => 'error',
-                'message' => 'You selected a Defect Code. Please change Judgement to NOT PASS.',
-                'errors' => array()
-            ));
-            exit();
-        }
-
-        // Validate required field
-        if (empty($serialNo)) {
-            echo json_encode(array(
-                'status' => 'error',
-                'message' => 'Serial number cannot be empty.',
-                'errors' => array()
-            ));
-            exit();
-        }
-
-        // Set default values if empty
-        if (empty($judgment)) $judgment = 'good';
-        if (empty($country))  $country = NULL;
-        if (empty($defectCode)) $defectCode = NULL;
-
-        // Check if serial number exists in Gibson database
-        $isGibson = $this->Qc_gibson_model->get_serials_gibson(array($serialNo));
-        if (empty($isGibson)) {
-            echo json_encode(array(
-                'status' => 'error',
-                'message' => 'This serial number is not a Gibson product.',
-                'errors' => array()
-            ));
-            exit();
-        }
-
-        // Prepare data array for insert/update
-        $aData = array(
-            'serial_no'   => $serialNo,
-            'defect_code' => $defectCode,
-            'country'     => $country,
-            'judgment'    => $judgment,
-            'guitar_type' => 'AG', // hardcode AG
-            'uploaded_by' => $this->sUsername,
-            'source'      => 'direct',
-            'date'        => date('Y-m-d H:i:s')
-        );
-
-        // Start database transaction
-        $this->db->trans_start();
-
-        // Insert or update based on existence
-        if ($this->Qc_gibson_model->is_exists($serialNo)) {
-            $rSave = $this->Qc_gibson_model->update_data($serialNo, $aData);
-            $action = 'updated';
-        } else {
-            $rSave = $this->Qc_gibson_model->insert_data($aData);
-            $action = 'saved';
-        }
-
-        // Rollback if failed to save/update
-        if (!$rSave) {
-            $this->db->trans_rollback();
-            echo json_encode(array(
-                'status' => 'error',
-                'message' => 'Failed to ' . $action . ' the serial number.',
-                'errors' => array()
-            ));
-            exit();
-        }
-
-        // Complete transaction
-        $this->db->trans_complete();
-
-        // Return success response
-        echo json_encode(array(
-            'status' => 'success',
-            'message' => 'The serial number has been successfully ' . $action . '!'
-        ));
-        exit();
-    }
-
 
     function doupload()
     {
@@ -534,7 +430,6 @@ class QcGibson extends Controller
 
         exit();
     }
-
 
     function _readfile($sFileName)
     {
