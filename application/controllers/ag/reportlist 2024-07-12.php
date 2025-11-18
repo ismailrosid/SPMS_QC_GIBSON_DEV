@@ -1786,7 +1786,7 @@ function group($sViewReport, $sMessage=''){
 		} else {
 			$this->load->helper('excel');
 			$aHeader = array(
-			    'd_production_date' => 'Production Date',
+				'd_production_date' => 'Production Date',
 				'd_plan_date' => 'Production Plan Date (Input)',
 				'd_delivery_date' => 'Production Plan Date (Output)',
 				'd_target_date' => 'Export Plan Date',
@@ -1801,59 +1801,46 @@ function group($sViewReport, $sMessage=''){
 				's_smodel' => 'Item Code',
 				's_location' => 'Location',
 				'd_process_1' => 'WK Center Input',
-				's_process_1_person' => 'Person WKCI',
 				'd_process_2' => 'WK Center Output',
-				's_process_2_person' => 'Person WKCO',
 				'd_process_3' => 'Wood Working',
-				's_process_3_person' => 'Person WW',
 				'd_process_4' => 'Coating-I',
-				's_process_4_person' => 'Person C1',
 				'd_process_5' => 'Sanding',
-				's_process_5_person' => 'Person S',
 				'd_process_6' => 'Coating-IIA',
-				's_process_6_person' => 'Person CIIA',
 				'd_process_7' => 'Coating-IIB',
-				's_process_7_person' => 'Person CIIB',
 				'd_process_8' => 'Assembly-I_Control Center',
-				's_process_8_person' => 'Person AICC',
 				'd_process_9' => 'Assembly-II',
-				's_process_9_person' => 'Person AII',
 				'd_process_10' => 'Packing',
-				's_process_10_person' => 'Person PACK',
 				'd_warehouse' => 'Warehouse Incoming',
-				's_warehouse_person' => 'Person WH-IN',
-				'd_process_14' => 'Warehouse Outgoing',
-				's_process_14_person' => 'Person WH-OUT'
-			);
-
-			$aDatas = array();
-			foreach ($aAllDataProduct as $nRow => $aEachDataProduct) {
-			    $aData = array();
-			    foreach ($aHeader as $field => $header) {
-				if (isset($aEachDataProduct[$field])) {
-				    $aData[$header] = $aEachDataProduct[$field];
-				} else {
-				    $aData[$header] = ''; // Menambahkan kolom kosong jika data tidak tersedia
+				'd_process_14' => 'Warehouse Outgoing');
+			$aDatas=array();
+			foreach($aAllDataProduct as $nRow=>$aEachDataProduct){
+				$aData=array();
+				foreach($aEachDataProduct as $sField=>$sValue) {
+					if (isset($aHeader[$sField])) {
+						$aData[$aHeader[$sField]]=$sValue;
+					} /*else {
+						$aData[$sField]=$sValue;
+					}*/
 				}
-			    }
-			    $aDatas[] = $aData;
+				$aDatas[]=$aData;
 			}
-
-			$aTotalDatas = array();
-			if (count($aAllDataProduct) > 0) {
-			    $nCounter = 1;
-			    foreach ($aHeader as $field => $header) {
-				if (substr($field, 0, 9) == 'd_process') {
-				    $aTotalDatas[$header] = isset($aTotalData['n_t_process_' . ($nCounter >= 11 ? ($nCounter + 3) : $nCounter)]) ? $aTotalData['n_t_process_' . ($nCounter >= 11 ? ($nCounter + 3) : $nCounter)] : '';
-				    $nCounter++;
-				} elseif ($field == 'd_warehouse') {
-				    $aTotalDatas[$header] = isset($aTotalData['n_t_warehouse']) ? $aTotalData['n_t_warehouse'] : '';
-				} else {
-				    $aTotalDatas[$header] = ' ';
+			$aTotalDatas=array();
+			if (count($aAllDataProduct)>0) {
+				$nCounter=1;
+				foreach($aAllDataProduct[0] as $sField=>$sValue) {
+					if (isset($aHeader[$sField])) {
+						if (substr($sField,0,9)=='d_process') {
+							$aTotalDatas[$sField] = $aTotalData['n_t_process_'.($nCounter >= 11 ? ($nCounter + 3) : $nCounter)];
+							$nCounter++;
+						} elseif ($sField=='d_warehouse') {
+							$aTotalDatas[$sField] = $aTotalData['n_t_warehouse'];
+						} else {
+							$aTotalDatas[$sField]=' ';
+						}
+					}
 				}
-			    }
 			}
-			$aDatas[] = $aTotalDatas;
+			$aDatas[]=$aTotalDatas;
 			to_excel_array($aDatas, 'report_serial_date');
 		}
 	}

@@ -211,6 +211,18 @@
       transform: rotate(360deg);
     }
   }
+
+  .input-error {
+    border-color: red !important;
+    background-color: #ffe6e6 !important;
+  }
+
+  .error-msg {
+    color: red;
+    font-size: 14px;
+    margin-top: 4px;
+    display: none;
+  }
 </style>
 
 <div class="card-form">
@@ -271,7 +283,7 @@
 
         <div class="btn-group">
           <button type="reset" id="resetBtn" disabled>Reset</button>
-          <button type="submit" id="saveBtn" disabled>Submit</button>
+          <button type="submit" id="saveBtn" disabled>Scan</button>
         </div>
       </form>
 
@@ -294,13 +306,11 @@
 
   function checkInput() {
     const hasSerial = serialInput.value.trim() !== "";
-    const hasDefect = defectSelect.value !== "";
-    saveBtn.disabled = !(hasSerial && hasDefect);
-    resetBtn.disabled = !(hasSerial || hasDefect);
+    saveBtn.disabled = !(hasSerial);
+    resetBtn.disabled = !(hasSerial);
   }
 
   serialInput.addEventListener("input", checkInput);
-  defectSelect.addEventListener("change", checkInput);
 
   document.getElementById("serialForm").addEventListener("submit", async function(e) {
     e.preventDefault();
@@ -308,8 +318,13 @@
   });
 
   resetBtn.addEventListener("click", function() {
+
+    // Reset all select to default
+    defectSelect.selectedIndex = 0; // "No Defect"
+    document.getElementById("countrySelect").selectedIndex = 0; // "All"
+    document.getElementById("judgementSelect").selectedIndex = 0; // "Pass"
+    // 
     serialInput.value = "";
-    defectSelect.value = "";
     saveBtn.disabled = true;
     resetBtn.disabled = true;
     hideCard();
@@ -328,8 +343,18 @@
   }
 
   async function submitSerial() {
-    if (!defectSelect.value) {
-      showError("Please select a defect from the list.");
+    const defectValue = defectSelect.value;
+    const judgementValue = document.getElementById("judgementSelect").value;
+
+    // FE VALIDATION → NOT PASS but No Defect
+    if (judgementValue === "0" && defectValue === "NULL") {
+      showError("If Judgement is NOT PASS, please select a Defect Code.");
+      return;
+    }
+
+    // FE VALIDATION → Defect chosen but Judgement PASS
+    if (judgementValue === "1" && defectValue !== "NULL") {
+      showError("You selected a Defect Code. Please change Judgement to NOT PASS.");
       return;
     }
 
@@ -337,7 +362,7 @@
     resetBtn.disabled = true;
 
     const originalText = saveBtn.innerHTML;
-    saveBtn.innerHTML = `<span class="spinner"></span> Submitting...`;
+    saveBtn.innerHTML = `<span class="spinner"></span> Scanning...`;
 
     const formData = new FormData();
     formData.append("serial_no", serialInput.value.trim());
@@ -362,8 +387,6 @@
       if (result.status === "error") showError(result.message, result.errors || []);
       else if (result.status === "success") {
         showSuccess(result.message);
-        serialInput.value = "";
-        defectSelect.value = "";
       } else showError("Unknown server response.");
 
     } catch (err) {

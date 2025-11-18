@@ -92,8 +92,8 @@ class Buyer extends Controller
 				$aCriteria[] = "s_division = '$s_division_filter'";
 			}
 			if ($this->input->post('s_status_filter')) {
-				$s_status_filter = $this->input->post('s_status_filter');
-				$aCriteria[] = "s_status = '$s_status_filter'";
+			    $s_status_filter = $this->input->post('s_status_filter');
+			    $aCriteria[] = "s_status = '$s_status_filter'";
 			}
 			foreach ($aSearchForm as $sField => $sValue) $aSearchForm[$sField] = $this->input->post($sField);
 			if (!empty($aCriteria)) {
@@ -391,3 +391,4 @@ class Buyer extends Controller
 		redirect("master/buyer/index/0/$sMessages");
 	}
 }
+

@@ -429,80 +429,63 @@ class Report_model extends Model {
 		return $oQuery->result_array();
     }
 	
-	function getListSerialDate($sCriteria = '', $nLimit = 0, $nOffset = 0, $aOrderby = array())
-	{
+	function getListSerialDate( $sCriteria='', $nLimit=0, $nOffset=0, $aOrderby=array() ){
 		$this->load->model('Util_model');
-
-		$sCriteria = ($sCriteria != '' ? " WHERE " . $sCriteria : '');
-		$sOrderBy = Util_model::getOrderBy($aOrderby);
-		$sLimit = ($nLimit == 0) ? "" : "LIMIT $nLimit";
-		$sOffset = ($nOffset == 0) ? "" : "OFFSET $nOffset";
-		$sLimitRows = $sLimit . " " . $sOffset;
-
-		$oQuery = $this->db->query("
+		
+		$sCriteria=($sCriteria!='' ? " WHERE ".$sCriteria : '');
+		$sOrderBy=Util_model::getOrderBy($aOrderby);
+		$sLimit=($nLimit==0)?"":"LIMIT $nLimit";
+		$sOffset=($nOffset==0)?"":"OFFSET $nOffset";
+		$sLimitRows=$sLimit." ".$sOffset;
+		
+        $oQuery = $this->db->query("
 			SELECT 	ttp.d_production_date, ttp.d_plan_date, ttp.d_delivery_date, ttp.d_target_date, 
 					ttp.s_serial_no, ttp.s_buyer_name, ttp.s_po_no, ttp.s_po, ttp.s_lot_no, ttp.s_model_name, ttp.s_color_name,
 					ttp.s_model, ttp.s_smodel,ttp.s_location,
-					ttp.d_process_1s,
-					ttp.d_process_1,s_process_1_by,
-					ttp2.d_process_1 AS d_process_1_2b,
-					ttp.d_process_2s,
-					ttp.d_process_2, s_process_2_by,
-					ttp2.d_process_2 AS d_process_2_2b,
-					ttp.d_process_3,s_process_3_by,
-					ttp.d_process_4,s_process_4_by,
-					ttp.d_process_5,s_process_5_by,
-					ttp.d_process_6,s_process_6_by,
-					ttp.d_process_7,s_process_7_by,
-					ttp.d_process_8,s_process_8_by, 
-					ttp.d_process_9,s_process_9_by, 
-					ttp.d_process_10,s_process_10_by, 
-					ttp.d_warehouse, s_process_warehouse_by,
-					ttp.d_process_14, s_process_14_by
-			FROM 	tv_production_stock_date_eg_with_person ttp	LEFT JOIN tv_production_stock_date_eg_2 ttp2	ON (ttp.s_serial_no_2 = ttp2.s_serial_no)
+					ttp.d_process_1s, ttp.d_process_1, ttp2.d_process_1 AS d_process_1_2b,
+					ttp.d_process_2s, ttp.d_process_2, ttp2.d_process_2 AS d_process_2_2b,
+					ttp.d_process_3,
+					ttp.d_process_4,
+					ttp.d_process_5,
+					ttp.d_process_6,
+					ttp.d_process_7,
+					ttp.d_process_8, ttp.d_process_9, ttp.d_process_10, ttp.d_warehouse, ttp.d_process_14
+			FROM 	tv_production_stock_date_eg ttp	LEFT JOIN tv_production_stock_date_eg_2 ttp2	ON (ttp.s_serial_no_2 = ttp2.s_serial_no)
 			$sCriteria 
 			$sOrderBy 
 			$sLimitRows ");
+		
 		return $oQuery->result_array();
-	}
-
-	function getListSerialDate2($sCriteria = '', $nLimit = 0, $nOffset = 0, $aOrderby = array())
-	{
+    }
+	
+	function getListSerialDate2( $sCriteria='', $nLimit=0, $nOffset=0, $aOrderby=array() ){
 		$this->load->model('Util_model');
-
-		$sCriteria = ($sCriteria != '' ? " WHERE " . $sCriteria : '');
-		$sOrderBy = Util_model::getOrderBy($aOrderby);
-		$sLimit = ($nLimit == 0) ? "" : "LIMIT $nLimit";
-		$sOffset = ($nOffset == 0) ? "" : "OFFSET $nOffset";
-		$sLimitRows = $sLimit . " " . $sOffset;
-
-		$oQuery = $this->db->query("
+		
+		$sCriteria=($sCriteria!='' ? " WHERE ".$sCriteria : '');
+		$sOrderBy=Util_model::getOrderBy($aOrderby);
+		$sLimit=($nLimit==0)?"":"LIMIT $nLimit";
+		$sOffset=($nOffset==0)?"":"OFFSET $nOffset";
+		$sLimitRows=$sLimit." ".$sOffset;
+		
+        $oQuery = $this->db->query("
 			SELECT 	ttp.d_production_date, ttp.d_plan_date, ttp.d_delivery_date, ttp.d_target_date, 
 					ttp.s_serial_no, ttp.s_buyer_name, ttp.s_po_no, ttp.s_po, ttp.s_lot_no, ttp.s_model_name, ttp.s_color_name,
 					ttp.s_model, ttp.s_smodel, ttp.s_location,
-					ttp.d_process_1s,
-					ttp.d_process_1,s_process_1_by,
-					ttp.d_process_1_2 AS d_process_1_2b,
-					ttp.d_process_2s,
-					ttp.d_process_2, s_process_2_by,
-					ttp.d_process_2_2 AS d_process_2_2b,
-					ttp.d_process_3,s_process_3_by,
-					ttp.d_process_4,s_process_4_by,
-					ttp.d_process_5,s_process_5_by,
-					ttp.d_process_6,s_process_6_by,
-					ttp.d_process_7,s_process_7_by,
-					ttp.d_process_8,s_process_8_by, 
-					ttp.d_process_9,s_process_9_by, 
-					ttp.d_process_10,s_process_10_by, 
-					ttp.d_warehouse, s_process_warehouse_by,
-					ttp.d_process_14, s_process_14_by
-			FROM 	tv_production_stock_date_eg_with_person ttp
+					ttp.d_process_1s, ttp.d_process_1, ttp.d_process_1_2 AS d_process_1_2b,
+					ttp.d_process_2s, ttp.d_process_2, ttp.d_process_2_2 AS d_process_2_2b,
+					ttp.d_process_3,
+					ttp.d_process_4,
+					ttp.d_process_5,
+					ttp.d_process_6,
+					ttp.d_process_7,
+					ttp.d_process_8, ttp.d_process_9, ttp.d_process_10, ttp.d_warehouse, ttp.d_process_14
+			FROM 	tv_production_stock_date_eg ttp
 			$sCriteria 
 			$sOrderBy 
 			$sLimitRows ");
-
+		
 		return $oQuery->result_array();
-	}
+    }
 	
 	function getListSerial( $sCriteria='', $nLimit=0, $nOffset=0, $aOrderby=array() ){
 		$this->load->model('Util_model');

@@ -221,7 +221,6 @@ class User extends Controller {
 	}
 	
 	function add(){
-
 		$sMessages=0;
 		
 		$this->User_model->aContainer['s_password'] = array('caption'=>'Password', 'rules'=>'trim|required|matches[s_password_confirm]','view'=>1,'edit'=>1);

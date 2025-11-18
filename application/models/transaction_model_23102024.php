@@ -28,16 +28,10 @@ class Transaction_model extends Model {
 		$sLimit=($nLimit==0)?"":"LIMIT $nLimit";
 		$sOffset=($nOffset==0)?"":"OFFSET $nOffset";
 		$sLimitRows=$sLimit." ".$sOffset;
-
-		
-                // $sFieldProcess_datetime = "TO_CHAR(d_process_9_datetime::timestamp, 'YYYY-MM-DD HH24:MI:SS')";
-		
-
 		
         $oQuery = $this->db->query("
 			SELECT 	ttpo.s_po_no, ttpo.s_po, 
 					" . $sFieldProcess . " AS d_transaction_date, 
-					TO_CHAR(". $sFieldProcess ."_datetime::timestamp, 'YYYY-MM-DD HH24:MI:SS') as d_transaction_datetime,
 					".$sFieldProcess."_plan AS d_transaction_plan_date, 
 					s_".substr($sFieldProcess, 2, $process_length)."_location AS s_transaction_location, 
 					s_".substr($sFieldProcess, 2, $process_length)."_update_by AS s_transaction_by,

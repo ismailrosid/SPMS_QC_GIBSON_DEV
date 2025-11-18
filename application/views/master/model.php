@@ -65,7 +65,7 @@
 								</select>
 							</td>
 						</tr>
-						<tr>
+<tr>
 							<td>Description</td>
 							<td><input type="text" id="s_description" name="s_description" value="{s_description}" maxlength="255" size="30"></td>
 						</tr>

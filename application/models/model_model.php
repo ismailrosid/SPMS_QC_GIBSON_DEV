@@ -127,3 +127,4 @@ class Model_model extends Model
 		return $this->db->insert('tm_model_color');
 	}
 }
+

@@ -178,6 +178,10 @@
 				<font class="content_title">Electric Guitar (QC Gibson)</font>
 				<ul class="list_menu">
 					<li>
+						<a href="{basesiteurl}/eg/qcgibson/masterdefect">Master Code Defect Form</a><br>
+						Manage and update the master list of defect codes used in QC Gibson
+					</li>
+					<li>
 						<a href="{basesiteurl}/eg/qcgibson/scan">Gibson Checker Upload Form</a><br>
 						Upload the serial numbers of Electric Guitar items for QC Gibson verification (Pass / Not Pass)
 					</li>

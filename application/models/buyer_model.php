@@ -96,3 +96,4 @@ class Buyer_model extends Model
 		return $this->db->delete('tm_customer');
 	}
 }
+

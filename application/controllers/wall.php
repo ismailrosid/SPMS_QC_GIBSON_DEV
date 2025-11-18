@@ -25,8 +25,6 @@ class Wall extends Controller {
 	}
 	
 	function index($sMessage=''){
-
-
 		$nOffset=0;
 		$nTotalRows=0;
 		

@@ -17,75 +17,50 @@
 			<th><a href="#" onClick="_doPost('sSort', 's_location', 'bSortAction')">Location</a></th>
 			
 			<th width="70px"><a href="#" onClick="_doPost('sSort', 'd_process_1', 'bSortAction')">WK Center Input</a></th>
-			<th width="70px">Person WKCI</th>
 			<th width="70px"><a href="#" onClick="_doPost('sSort', 'd_process_2', 'bSortAction')">WK Center Output - Body</a></th>
-			<th width="70px">Person WKCO-B</th>
 			<th width="70px"><a href="#" onClick="_doPost('sSort', 'd_process_3', 'bSortAction')">Wood Working</a></th>
-			<th width="70px">PERSON WW</th>
 			<th width="70px"><a href="#" onClick="_doPost('sSort', 'd_process_4', 'bSortAction')">Coating-I - Neck</a></th>
-			<th width="70px">PERSON C1-N</th>
 			<th width="70px"><a href="#" onClick="_doPost('sSort', 'd_process_5', 'bSortAction')">Sanding</a></th>
-			<th width="70px">PERSON S</th>
 			<th width="70px"><a href="#" onClick="_doPost('sSort', 'd_process_6', 'bSortAction')">Coating-IIA</a></th>
-			<th width="70px">PERSON CIIA</th>
 			<th width="70px"><a href="#" onClick="_doPost('sSort', 'd_process_7', 'bSortAction')">Coating-IIB</a></th>
-			<th width="70px">PERSON CIIB</th>
 			<th width="70px"><a href="#" onClick="_doPost('sSort', 'd_process_8', 'bSortAction')">Assembly-I_Control Center</a></th>
-			<th width="70px">PERSON AICC</th>
 			<th width="70px"><a href="#" onClick="_doPost('sSort', 'd_process_9', 'bSortAction')">Assembly-II</a></th>
-			<th width="70px">PERSON AII</th>
 			<th width="70px"><a href="#" onClick="_doPost('sSort', 'd_process_10', 'bSortAction')">Packing</a></th>
-			<th width="70px">PERSON PACK</th>
 			<th width="70px"><a href="#" onClick="_doPost('sSort', 'd_warehouse', 'bSortAction')">Warehouse Incoming</a></th>
-			<th width="70px">PERSON WH-IN</th>
 			<th width="70px"><a href="#" onClick="_doPost('sSort', 'd_process_14', 'bSortAction')">Warehouse Outgoing</a></th>
-			<th width="70px">PERSON WH-OUT</th>
 			
 		</tr>
 	</thead>
 	<tbody>
-<?php foreach ($tt_report_stock as $nIndex => $aValue) { ?>
-			<tr>
-				<td><?= $aValue['d_production_date'] ?></td>
-				<td><?= $aValue['d_plan_date'] ?></td>
-				<td><?= $aValue['d_delivery_date'] ?></td>
-				<td><?= $aValue['d_target_date'] ?></td>
-				<td><?= $aValue['s_serial_no'] ?></td>
-				<td><?= $aValue['s_buyer_name'] ?></td>
-				<td><?= $aValue['s_po_no'] ?></td>
-				<td><?= $aValue['s_po'] ?></td>
-				<td><?= $aValue['s_lot_no'] ?></td>
-				<td><?= $aValue['s_model'] ?></td>
-				<td><?= $aValue['s_model_name'] ?></td>
-				<td><?= $aValue['s_color_name'] ?></td>
-				<td><?= $aValue['s_smodel'] ?></td>
-				<td><?= $aValue['s_location'] ?></td>
-				<td align="center"><?= ($aValue['d_process_1'] == '1900-01-01' ? '####-##-##' : $aValue['d_process_1']) ?></td>
-				<td><?= $aValue['s_process_1_person'] ?></td>
-				<td align="center"><?= ($aValue['d_process_2'] == '1900-01-01' ? '####-##-##' : $aValue['d_process_2']) ?></td>
-				<td><?= $aValue['s_process_2_person'] ?></td>
-				<td align="center"><?= ($aValue['d_process_3'] == '1900-01-01' ? '####-##-##' : $aValue['d_process_3']) ?></td>
-				<td><?= $aValue['s_process_3_person'] ?></td>
-				<td align="center"><?= ($aValue['d_process_4'] == '1900-01-01' ? '####-##-##' : $aValue['d_process_4']) ?></td>
-				<td><?= $aValue['s_process_4_person'] ?></td>
-				<td align="center"><?= ($aValue['d_process_5'] == '1900-01-01' ? '####-##-##' : $aValue['d_process_5']) ?></td>
-				<td><?= $aValue['s_process_5_person'] ?></td>
-				<td align="center"><?= ($aValue['d_process_6'] == '1900-01-01' ? '####-##-##' : $aValue['d_process_6']) ?></td>
-				<td><?= $aValue['s_process_6_person'] ?></td>
-				<td align="center"><?= ($aValue['d_process_7'] == '1900-01-01' ? '####-##-##' : $aValue['d_process_7']) ?></td>
-				<td><?= $aValue['s_process_7_person'] ?></td>
-				<td align="center"><?= ($aValue['d_process_8'] == '1900-01-01' ? '####-##-##' : $aValue['d_process_8']) ?></td>
-				<td><?= $aValue['s_process_8_person'] ?></td>
-				<td align="center"><?= ($aValue['d_process_9'] == '1900-01-01' ? '####-##-##' : $aValue['d_process_9']) ?></td>
-				<td><?= $aValue['s_process_9_person'] ?></td>
-				<td align="center"><?= ($aValue['d_process_10'] == '1900-01-01' ? '####-##-##' : $aValue['d_process_10']) ?></td>
-				<td><?= $aValue['s_process_10_person'] ?></td>
-				<td align="center"><?= ($aValue['d_warehouse'] == '1900-01-01' ? '####-##-##' : $aValue['d_warehouse']) ?></td>
-				<td><?= $aValue['s_warehouse_person'] ?></td>
-				<td align="center"><?= $aValue['d_process_14'] ?></td>
-				<td><?= $aValue['s_process_14_person'] ?></td>
-			</tr>
-		<?php 	} ?>
+<?php 	foreach($tt_report_stock as $nIndex=>$aValue){?>
+		<tr><td><?=$aValue['d_production_date']?></td>
+			<td><?=$aValue['d_plan_date']?></td>
+			<td><?=$aValue['d_delivery_date']?></td>
+			<td><?=$aValue['d_target_date']?></td>
+			<td><?=$aValue['s_serial_no']?></td>
+			<td><?=$aValue['s_buyer_name']?></td>
+			<td><?=$aValue['s_po_no']?></td>
+			<td><?=$aValue['s_po']?></td>
+			<td><?=$aValue['s_lot_no']?></td>
+			<td><?=$aValue['s_model']?></td>
+			<td><?=$aValue['s_model_name']?></td>
+			<td><?=$aValue['s_color_name']?></td>
+			<td><?=$aValue['s_smodel']?></td>
+			<td><?=$aValue['s_location']?></td>
+			<td align="center"><?=($aValue['d_process_1'] == '1900-01-01' ? '####-##-##' : $aValue['d_process_1'])?></td>
+			<td align="center"><?=($aValue['d_process_2'] == '1900-01-01' ? '####-##-##' : $aValue['d_process_2'])?></td>
+			<td align="center"><?=($aValue['d_process_3'] == '1900-01-01' ? '####-##-##' : $aValue['d_process_3'])?></td>
+			<td align="center"><?=($aValue['d_process_4'] == '1900-01-01' ? '####-##-##' : $aValue['d_process_4'])?></td>
+			<td align="center"><?=($aValue['d_process_5'] == '1900-01-01' ? '####-##-##' : $aValue['d_process_5'])?></td>
+			<td align="center"><?=($aValue['d_process_6'] == '1900-01-01' ? '####-##-##' : $aValue['d_process_6'])?></td>
+			<td align="center"><?=($aValue['d_process_7'] == '1900-01-01' ? '####-##-##' : $aValue['d_process_7'])?></td>
+			<td align="center"><?=($aValue['d_process_8'] == '1900-01-01' ? '####-##-##' : $aValue['d_process_8'])?></td>
+			<td align="center"><?=($aValue['d_process_9'] == '1900-01-01' ? '####-##-##' : $aValue['d_process_9'])?></td>
+			<td align="center"><?=($aValue['d_process_10'] == '1900-01-01' ? '####-##-##' : $aValue['d_process_10'])?></td>
+			<td align="center"><?=($aValue['d_warehouse'] == '1900-01-01' ? '####-##-##' : $aValue['d_warehouse'])?></td>
+			<td align="center"><?=$aValue['d_process_14']?></td>
+		</tr>
+<?php 	}?>
 	</tbody>
 	<tfoot class="table_footer">
 		{tt_report_stock_total}

@@ -113,7 +113,6 @@ class Smodel extends Controller
 				$aCriteria[] = "m.s_status = '$s_status_filter'";
 			}
 			foreach ($aSearchForm as $sField => $sValue) $aSearchForm[$sField] = $this->input->post($sField);
-
 			if (!empty($aCriteria)) {
 				$this->session->set_userdata(array('model_search' => $aCriteria));
 				$this->session->set_userdata(array('model_search_form' => $aSearchForm));
@@ -170,9 +169,7 @@ class Smodel extends Controller
 			$nLimit = $aPagination['nLimit'];
 		}
 		$sCriteria = implode(' AND ', $aCriteria);
-		// print_r($aCriteria);
-		// print_r($aSort);
-		// die;
+
 		$aSmodel = $this->Model_model->getList($sCriteria, $nLimit, $nOffset, $aSort);
 		$nTotalRows = count($this->Model_model->getList($sCriteria));
 		$sMessages = '';
@@ -303,13 +300,13 @@ class Smodel extends Controller
 			} else {
 				$sMessages = 1;
 				if (!empty($aData['s_color'])) {
-					$sCode = $this->Model_model->insertModelColor($aData['s_code'], $aData['s_color']);
-					if ($sCode === FALSE) {
-						$sMessages = 0;
-					} else {
-						$sMessages = 1;
-					}
-				}
+				$sCode = $this->Model_model->insertModelColor($aData['s_code'], $aData['s_color']);
+				if ($sCode === FALSE) {
+					$sMessages = 0;
+				} else {
+					$sMessages = 1;
+				}	
+			}
 			}
 			redirect("master/smodel/index/$sCode/$sMessages");
 		}

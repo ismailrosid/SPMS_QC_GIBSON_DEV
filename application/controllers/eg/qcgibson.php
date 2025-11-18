@@ -39,6 +39,7 @@ class QcGibson extends Controller
         $this->aDivision   = $this->config->item('division');
     }
 
+    // index / listing page (optional message)
     function index($sMessage = '')
     {
         $messages = array('1' => 'Data berhasil disimpan.', '2' => 'Upload file gagal.', '3' => 'Data berhasil dihapus.');
@@ -57,6 +58,102 @@ class QcGibson extends Controller
         $this->parser->parse('footer', $aDisplay);
     }
 
+    // MASTER DEFECT UI (copied from AG, adjusted paths)
+    function masterdefect()
+    {
+        // Load all defect categories from model
+        $aCategoryDefects = $this->Qc_gibson_model->get_all_category_defect();
+
+        $aDisplay = array(
+            'baseurl'          => base_url(),
+            'basesiteurl'      => site_url(),
+            'siteurl'          => site_url() . '/eg/qcgibson/',
+            'PAGE_TITLE'       => 'SPMS-G. Master Code Defect (EG)',
+            'sGlobalUserName'  => $this->sUsername,
+            'sGlobalUserLevel' => $this->sLevel,
+            'category_defects' => $aCategoryDefects  // pass to view
+        );
+
+        $this->parser->parse('header', $aDisplay);
+        $this->parser->parse('eg/qcgibson/masterdefect', $aDisplay);
+        $this->parser->parse('footer', $aDisplay);
+    }
+
+    // Save or update master defect (JSON endpoint)
+    function savedefect()
+    {
+        header('Content-Type: application/json');
+
+        // Get input values from POST
+        $categoryCode = trim($this->input->post('category_code', true));
+        $defectCode   = trim($this->input->post('defect_code', true));
+        $defectName   = trim($this->input->post('defect_name', true));
+
+        $errorGroups = array();
+
+        // Validate required fields
+        if (empty($categoryCode)) $errorGroups[] = 'Category must be selected.';
+        if (empty($defectCode))   $errorGroups[] = 'Defect code cannot be empty.';
+        if (empty($defectName))   $errorGroups[] = 'Defect name cannot be empty.';
+
+        if (!empty($errorGroups)) {
+            echo json_encode(array(
+                'status' => 'error',
+                'message' => 'Please correct the following errors:',
+                'errors'  => $errorGroups,
+                'success' => array()
+            ));
+            exit();
+        }
+
+        // Prepare data array for insert/update
+        $aData = array(
+            'category_code' => $categoryCode,
+            'defect_code'   => $defectCode,
+            'defect_name'   => $defectName,
+            // 'created_by'    => $this->sUsername,
+            // 'created_at'    => date('Y-m-d H:i:s')
+        );
+
+        // Start database transaction
+        $this->db->trans_start();
+
+        // Check if defect code already exists
+        $exists = $this->Qc_gibson_model->get_category_defect_by_code($defectCode);
+
+        if ($exists) {
+            $rSave = $this->Qc_gibson_model->update_defect($defectCode, $aData);
+            $action = 'updated';
+        } else {
+            $rSave = $this->Qc_gibson_model->insert_defect($aData);
+            $action = 'saved';
+        }
+
+        if (!$rSave) {
+            $this->db->trans_rollback();
+            echo json_encode(array(
+                'status' => 'error',
+                'message' => 'Failed to ' . $action . ' defect code.',
+                'errors'  => array(),
+                'success' => array()
+            ));
+            exit();
+        }
+
+        // Commit transaction
+        $this->db->trans_complete();
+
+        // Return success response
+        echo json_encode(array(
+            'status'  => 'success',
+            'message' => 'The defect code has been successfully ' . $action . '!',
+            'errors'  => array(),
+            'success' => array($defectCode)
+        ));
+        exit();
+    }
+
+    // SCAN page (EG)
     function scan()
     {
         $aDisplay = array(
@@ -65,7 +162,7 @@ class QcGibson extends Controller
             'siteurl'          => site_url() . '/eg/qcgibson/',
             'PAGE_TITLE'       => 'SPMS-G. Scan QC Gibson (EG)',
             'sGlobalUserName'  => $this->sUsername,
-            'sGlobalUserLevel' => $this->sLevel
+            'sGlobalUserLevel' => $this->sLevel,
         );
 
         $this->parser->parse('header', $aDisplay);
@@ -73,15 +170,18 @@ class QcGibson extends Controller
         $this->parser->parse('footer', $aDisplay);
     }
 
+    // DIRECT page (EG) — pass defects to view
     function direct()
     {
+        $defects = $this->Qc_gibson_model->get_defect();
         $aDisplay = array(
             'baseurl'          => base_url(),
             'basesiteurl'      => site_url(),
             'siteurl'          => site_url() . '/eg/qcgibson/',
             'PAGE_TITLE'       => 'SPMS-G. Direct Scan Serial Gibson (EG)',
             'sGlobalUserName'  => $this->sUsername,
-            'sGlobalUserLevel' => $this->sLevel
+            'sGlobalUserLevel' => $this->sLevel,
+            'defects'          => $defects, // All defects sent to the view
         );
 
         $this->parser->parse('header', $aDisplay);
@@ -89,16 +189,38 @@ class QcGibson extends Controller
         $this->parser->parse('footer', $aDisplay);
     }
 
+    // Save single direct scan (EG) with same business rules as AG version
     function savedirect()
     {
         header('Content-Type: application/json');
 
-        $serialNo  = trim($this->input->post('serial_no', true));
-        $scanDate  = trim($this->input->post('date', true));
-        $userScan  = trim($this->input->post('user_scan', true));
-        $location  = trim($this->input->post('location', true));
-        $judgment  = trim($this->input->post('judgment', true));
+        // Get input values from POST
+        $serialNo   = trim($this->input->post('serial_no', true));
+        $defectCode = trim($this->input->post('defect_code', true));
+        $country    = trim($this->input->post('country', true));
+        $judgmentPost = trim($this->input->post('judgement', true)); // note: original uses 'judgement'
+        $judgment = ($judgmentPost === "1") ? 'good' : 'nogood';
 
+        // Frontend double validation in backend
+        if ($judgmentPost === "0" && ($defectCode === "NULL" || empty($defectCode))) {
+            echo json_encode(array(
+                'status' => 'error',
+                'message' => 'If Judgement is NOT PASS, please select a Defect Code.',
+                'errors' => array()
+            ));
+            exit();
+        }
+
+        if ($judgmentPost === "1" && $defectCode !== "NULL" && !empty($defectCode)) {
+            echo json_encode(array(
+                'status' => 'error',
+                'message' => 'You selected a Defect Code. Please change Judgement to NOT PASS.',
+                'errors' => array()
+            ));
+            exit();
+        }
+
+        // Validate required field
         if (empty($serialNo)) {
             echo json_encode(array(
                 'status' => 'error',
@@ -108,11 +230,12 @@ class QcGibson extends Controller
             exit();
         }
 
-        if (empty($scanDate))  $scanDate  = date('Y-m-d H:i:s');
-        if (empty($userScan))  $userScan  = $this->sUsername;
-        if (empty($location))  $location  = NULL;
-        if (empty($judgment))  $judgment  = 'good';
+        // Set default values if empty
+        if (empty($judgment)) $judgment = 'good';
+        if (empty($country))  $country = NULL;
+        if (empty($defectCode)) $defectCode = NULL;
 
+        // Check if serial number exists in Gibson database
         $isGibson = $this->Qc_gibson_model->get_serials_gibson(array($serialNo));
         if (empty($isGibson)) {
             echo json_encode(array(
@@ -123,18 +246,22 @@ class QcGibson extends Controller
             exit();
         }
 
+        // Prepare data array for insert/update
         $aData = array(
             'serial_no'   => $serialNo,
-            'date'        => $scanDate,
-            'user_scan'   => $userScan,
-            'location'    => $location,
+            'defect_code' => $defectCode,
+            'country'     => $country,
             'judgment'    => $judgment,
+            'guitar_type' => 'EG', // hardcode EG
             'uploaded_by' => $this->sUsername,
-            'source'      => 'direct'
+            'source'      => 'direct',
+            'date'        => date('Y-m-d H:i:s')
         );
 
+        // Start database transaction
         $this->db->trans_start();
 
+        // Insert or update based on existence
         if ($this->Qc_gibson_model->is_exists($serialNo)) {
             $rSave = $this->Qc_gibson_model->update_data($serialNo, $aData);
             $action = 'updated';
@@ -143,6 +270,7 @@ class QcGibson extends Controller
             $action = 'saved';
         }
 
+        // Rollback if failed to save/update
         if (!$rSave) {
             $this->db->trans_rollback();
             echo json_encode(array(
@@ -153,8 +281,10 @@ class QcGibson extends Controller
             exit();
         }
 
+        // Complete transaction
         $this->db->trans_complete();
 
+        // Return success response
         echo json_encode(array(
             'status' => 'success',
             'message' => 'The serial number has been successfully ' . $action . '!'
@@ -162,6 +292,7 @@ class QcGibson extends Controller
         exit();
     }
 
+    // Upload batch file (EG) — same behavior as AG, guitar_type set to EG in saved entries
     function doupload()
     {
         set_time_limit(300);
@@ -170,27 +301,33 @@ class QcGibson extends Controller
 
         $sElementName = 'f_file_name';
 
+        // Check if file was uploaded
         if (!isset($_FILES[$sElementName]['name']) || empty($_FILES[$sElementName]['name'])) {
             echo json_encode(array('status' => 'error', 'message' => 'No file was uploaded.', 'errors' => array()));
             exit();
         }
 
+        // Clean the uploaded file name to remove unwanted characters
         $sUploadedFileName = preg_replace("/[^a-zA-Z0-9_\-\.]/", "_", $_FILES[$sElementName]['name']);
         $sTmpPath = $_FILES[$sElementName]['tmp_name'];
 
+        // Only allow .txt files
         if (strtolower(pathinfo($sUploadedFileName, PATHINFO_EXTENSION)) != 'txt') {
             echo json_encode(array('status' => 'error', 'message' => 'Only .txt files are allowed.', 'errors' => array()));
             exit();
         }
 
+        // Ensure the upload directory exists
         $this->_forcePath($this->sUploadPath);
         $sDestPath = $this->sUploadPath . '/' . $sUploadedFileName;
 
+        // Move uploaded file to the designated upload folder
         if (!move_uploaded_file($sTmpPath, $sDestPath)) {
             echo json_encode(array('status' => 'error', 'message' => 'Failed to move the file to the upload folder.', 'errors' => array()));
             exit();
         }
 
+        // Read uploaded file line by line
         $lines = $this->_readfile($sUploadedFileName);
         $allSerials  = array();
         $dataToSave  = array();
@@ -211,7 +348,9 @@ class QcGibson extends Controller
             $userScan = trim($parts[2]);
             $location = trim($parts[3]);
 
+            // Get judgment column from file, default to 'nogood' if empty/invalid
             $judgment = trim($parts[4]);
+            // convert judgment ke lowercase dan validasi
             $judgmentLower = strtolower($judgment);
             if ($judgmentLower != 'good' && $judgmentLower != 'nogood') {
                 $judgment = 'nogood';
@@ -227,19 +366,23 @@ class QcGibson extends Controller
                 'location'    => $location,
                 'judgment'    => $judgment,
                 'uploaded_by' => $this->sUsername,
-                'source'      => $sUploadedFileName
+                'source'      => $sUploadedFileName,
+                'guitar_type' => 'EG' // mark as EG for batch uploads too
             );
         }
 
+        // Get list of valid Gibson serial numbers from database
         $validSerials = $this->Qc_gibson_model->get_serials_gibson($allSerials);
 
-        $notGibsonSerials = array();
-        $serialErrors = array();
+        $notGibsonSerials = array(); // serial numbers not valid for Gibson
+        $serialErrors = array();     // serials failed to insert/update
 
+        // Start a single transaction for all serials
         $this->db->trans_start();
 
         foreach ($allSerials as $sn) {
 
+            // Skip invalid Gibson serial numbers
             if (!in_array($sn, $validSerials)) {
                 $notGibsonSerials[] = $sn;
                 continue;
@@ -247,10 +390,11 @@ class QcGibson extends Controller
 
             $aData = $dataToSave[$sn];
 
+            // Insert or update
             if ($this->Qc_gibson_model->is_exists($sn)) {
                 $rSave = $this->Qc_gibson_model->update_data($sn, $aData);
             } else {
-                $rSave = $this->Qc_gibson_model->insert_data($sn, $aData);
+                $rSave = $this->Qc_gibson_model->insert_data($aData);
             }
 
             if (!$rSave) {
@@ -259,10 +403,12 @@ class QcGibson extends Controller
             }
         }
 
+        // If any serial failed to save, rollback all
         if (!empty($serialErrors) || !empty($notGibsonSerials)) {
-            $this->db->trans_rollback();
+            $this->db->trans_rollback(); // rollback everything
             $errorGroups = array();
 
+            // Message for serials that are not Gibson products
             if (!empty($notGibsonSerials)) {
                 $title = count($notGibsonSerials) == 1 ?
                     'The serial number is not a Gibson product' :
@@ -270,12 +416,14 @@ class QcGibson extends Controller
                 $errorGroups[] = array('title' => $title, 'items' => $notGibsonSerials);
             }
 
+            // Message for failed insert/update
             if (!empty($serialErrors)) {
                 $title = count($serialErrors) == 1 ?
                     'Failed to save or update the serial number' :
                     'Failed to save or update some serial numbers';
                 $errorGroups[] = array('title' => $title, 'items' => $serialErrors);
             }
+
 
             echo json_encode(array(
                 'status' => 'error',
@@ -284,6 +432,7 @@ class QcGibson extends Controller
                 'success' => array()
             ));
         } else {
+            // Commit transaction if all serials succeeded
             $this->db->trans_complete();
             $msg = count($allSerials) == 1 ?
                 'The serial number has been successfully saved/updated!' :
@@ -299,6 +448,7 @@ class QcGibson extends Controller
         exit();
     }
 
+    // Helper to read file
     function _readfile($sFileName)
     {
         $aData = array();
@@ -315,6 +465,7 @@ class QcGibson extends Controller
         return $aData;
     }
 
+    // Ensure path exists
     function _forcePath($sPath)
     {
         if (!is_dir($sPath)) {

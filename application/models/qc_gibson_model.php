@@ -18,6 +18,7 @@ class Qc_gibson_model extends Model
         return $query->num_rows() > 0;
     }
 
+    
     /**
      * Get single row from tt_checker_gibson by serial_no
      */
@@ -52,7 +53,7 @@ class Qc_gibson_model extends Model
         return $rInsert !== FALSE;
     }
 
-    /**
+      /**
      * Insert new history data into thst_checker_gibson
      */
     function insert_history($aData)
@@ -77,7 +78,6 @@ class Qc_gibson_model extends Model
         $rInsert = $this->db->insert('thst_checker_gibson');
         return $rInsert !== FALSE;
     }
-
 
     /**
      * Update existing data for a specific serial number

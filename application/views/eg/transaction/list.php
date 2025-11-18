@@ -10,6 +10,7 @@
 				<th><a href="#" onClick="_doPost('sSort', 'd_order_date', 'bSortAction')">Receive Order</a></th>
 				<!-- <th><a href="#" onClick="_doPost('sSort', 's_phase', 'bSortAction')">Phase</a></th> -->
 				<th><a href="#" onClick="_doPost('sSort', 'd_transaction_date', 'bSortAction')">Date</a></th>
+<th><a href="#" onClick="_doPost('sSort', 'd_transaction_date', 'bSortAction')">Upload At</a></th>
 				<th><a href="#" onClick="_doPost('sSort', 'd_transaction_plan_date', 'bSortAction')">Plan Date</a></th>
 				<th><a href="#" onClick="_doPost('sSort', 's_transaction_location', 'bSortAction')">Location</a></th>
 				<th><a href="#" onClick="_doPost('sSort', 's_transaction_by', 'bSortAction')">Scaned By</a></th>
@@ -35,7 +36,8 @@
 				<td>{s_po}</td>
 				<td>{d_order_date}</td>
 				<!-- <td>{s_phase}</td> -->
-				<td>{d_transaction_date}</td>
+				<td style="text-align: center; vertical-align: middle;">{d_transaction_date}</td>
+<td style="text-align: center; vertical-align: middle;">{d_transaction_datetime}</td>
 				<td>{d_transaction_plan_date}</td>
 				<td>{s_transaction_location}</td>
 				<td>{s_transaction_by}</td>

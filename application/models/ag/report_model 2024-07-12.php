@@ -366,13 +366,12 @@ function getListColor( $sCriteria='', $nLimit=0, $nOffset=0, $aOrderby=array() )
 		$sOffset=($nOffset==0)?"":"OFFSET $nOffset";
 		$sLimitRows=$sLimit." ".$sOffset;
 		
-		$oQuery = $this->db->query("
-				SELECT 	ttp.*
-				FROM 	tv_production_stock_date_ag_with_person ttp
-				$sCriteria 
-				$sOrderBy 
-				$sLimitRows ");
-
+        $oQuery = $this->db->query("
+			SELECT 	ttp.*
+			FROM 	tv_production_stock_date_ag ttp
+			$sCriteria 
+			$sOrderBy 
+			$sLimitRows ");
 		
 		return $oQuery->result_array();
     }

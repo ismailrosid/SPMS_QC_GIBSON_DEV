@@ -7,7 +7,7 @@
 				<th><a href="#" onClick="_doPost('sSort', 's_po', 'bSortAction')">PO</a></th>
 				<th><a href="#" onClick="_doPost('sSort', 'd_order_date', 'bSortAction')">Receive Order</a></th>
 				<th><a href="#" onClick="_doPost('sSort', 'd_production_date', 'bSortAction')">Production Date</a></th>
-				<!-- <th><a href="#" onClick="_doPost('sSort', 'd_plan_date', 'bSortAction')">Production Plan Date (Input)</a></th> -->
+			<!--	<th><a href="#" onClick="_doPost('sSort', 'd_plan_date', 'bSortAction')">Production Plan Date (Input)</a></th> -->
 				<th><a href="#" onClick="_doPost('sSort', 'd_delivery_date', 'bSortAction')">Production Plan Date (Output)</a></th>
 				<th><a href="#" onClick="_doPost('sSort', 'd_target_date', 'bSortAction')">Export Plan Date</a></th>
 				<th><a href="#" onClick="_doPost('sSort', 's_buyer_name', 'bSortAction')">Buyer</a></th>
@@ -28,8 +28,8 @@
 				<td><a href="{siteurl}viewedit/{sDivision}/<?=$aValue['u_id']?>"><?=$aValue['s_po_no']?></a></td>
 				<td><?=$aValue['s_po']?></td>
 				<td><?=$aValue['d_order_date']?></td>
-				<td><?=$aValue['d_production_date']?></td>
-				<!-- <td><?=$aValue['d_plan_date']?></td> -->
+				<td><?=$aValue['d_production_date']?></td> 
+				<!-- <td><?php // echo $aValue['d_plan_date']?></td> -->
 				<td><?=$aValue['d_delivery_date']?></td>
 				<td><?=$aValue['d_target_date']?></td>
 				<td><?=$aValue['s_buyer_name']?></td>

@@ -1,4 +1,4 @@
-<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
+<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /*
 |--------------------------------------------------------------------------
@@ -11,8 +11,8 @@
 |	http://example.com/
 |
 */
-$config['base_url']	= "http://localhost/done/";
-
+// $config['base_url']	= "http://".$_SERVER['HTTP_HOST']."/";
+$config['base_url']	= "http://localhost/spmsg/";
 /*
 |--------------------------------------------------------------------------
 | Index File
@@ -336,12 +336,12 @@ $config['division'] = array(
 );
 
 $config['production_process'] = array(
-	'AG'	=> 'Accoustic Guitar',
+	'AG'	=> 'Accoustic Guitar', 
 	'EG'	=> 'Electric Guitar'
 );
 
 $config['serial_reset'] = array(
-	'month'	=> 'Monthly',
+	'month'	=> 'Monthly', 
 	'year'	=> 'Yearly'
 );
 

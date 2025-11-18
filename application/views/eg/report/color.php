@@ -77,8 +77,8 @@
 		{tt_report_stock_total}
 		<tr>
 			<td></td>
-			<!-- <td></td> -->
-			<!-- <td></td> -->
+			<!-- <td></td>
+			<td></td> -->
 			<td></td>
 			<td></td>
 			<td></td>

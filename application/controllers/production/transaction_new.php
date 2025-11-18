@@ -66,7 +66,6 @@ class Transaction extends Controller
 			's_serial_no2_filter'			=> '',
 			's_po_no_filter'			=> '',
 			's_po_filter'				=> '',
-			's_sku'				=> '',
 			's_phase_filter'			=> '',
 			'ago_d_transaction_date_filter'		=> '',
 			'now_d_transaction_date_filter'		=> '',
@@ -161,10 +160,6 @@ class Transaction extends Controller
 			if ($this->input->post('s_location_filter')) {
 				$s_location_filter = $this->input->post('s_location_filter');
 				$aCriteria[] = "ttp.s_location = '$s_location_filter'";
-			}
-			if ($this->input->post('s_sku')) {
-				$s_sku = $this->input->post('s_sku');
-				$aCriteria[] = "ttp.s_model ILIKE '%$s_sku%'";
 			}
 
 
@@ -595,14 +590,14 @@ class Transaction extends Controller
 			's_po_no' => 'PI Number',
 			's_po' => 'PO',
 			'd_order_date' => 'Receive Order',
-			// 's_phase' => 'Phase',
+			's_phase' => 'Phase',
 			'd_transaction_date' => 'Date',
 			'd_transaction_plan_date' => 'Plan Date',
 			's_transaction_location' => 'Location',
 			's_transaction_by' => 'Scaned By',
 			'd_production_date' => 'Production Date',
-			// 'd_plan_date' => 'Production Plan Date (Input)',
-			// 'd_delivery_date' => 'Production Plan Date (Output)',
+			'd_plan_date' => 'Production Plan Date (Input)',
+			'd_delivery_date' => 'Production Plan Date (Output)',
 			'd_target_date' => 'Export Plan Date',
 			's_lot_no' => 'Lot Number',
 			's_buyer_name' => 'Buyer',
@@ -968,5 +963,3 @@ class Transaction extends Controller
 		redirect("production/transaction/export_list/$sDivision/$sMessages");
 	}
 }
-
-

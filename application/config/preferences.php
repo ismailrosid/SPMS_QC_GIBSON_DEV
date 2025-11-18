@@ -36,7 +36,8 @@ $config['product_location'] = array(
 	'AG_C' => 'AG_C',
 	'EG' => 'EG',
 	'EG_1' => 'EG_1',
-	'EG_2' => 'EG_2'
+	'EG_2' => 'EG_2',
+	'REWORK' => 'REWORK'
 );
 
 $config['model_difficult'] = array(

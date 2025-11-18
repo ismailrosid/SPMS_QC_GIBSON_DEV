@@ -73,7 +73,38 @@ class Report2_model extends Model {
 		
 		return $oQuery->result_array();
 	}
-
+	
+	function getListBuyer( $sCriteria='', $nLimit=0, $nOffset=0, $aOrderby=array() ){
+		$sCriteria=($sCriteria!='' ? " WHERE ".$sCriteria : '');
+		$sOrderBy=Util_model::getOrderBy($aOrderby);
+		$sLimit=($nLimit==0)?"":"LIMIT $nLimit";
+		$sOffset=($nOffset==0)?"":"OFFSET $nOffset";
+		$sLimitRows=$sLimit." ".$sOffset;
+		$oQuery=$this->db->query("
+			SELECT 	EXTRACT(YEAR FROM ttp.d_production_date) || '-' || EXTRACT(MONTH FROM ttp.d_production_date) AS d_production_date, 
+					ttp.d_plan_date, ttp.d_delivery_date,
+					ttp.d_target_date, ttp.s_buyer, ttp.s_buyer_name, 
+					SUM(ttp.n_process_1) AS n_process_1,
+					SUM(ttp.n_process_2) AS n_process_2,
+					SUM(ttp.n_process_3) AS n_process_3,
+					SUM(ttp.n_process_4) AS n_process_4,
+					SUM(ttp.n_process_5) AS n_process_5,
+					SUM(ttp.n_process_6) AS n_process_6,
+					SUM(ttp.n_process_7) AS n_process_7,
+					SUM(ttp.n_process_8) AS n_process_8,
+					SUM(ttp.n_process_9) AS n_process_9,
+					SUM(ttp.n_process_10) AS n_process_10,
+					SUM(ttp.n_process_14) AS n_process_14,
+					(SUM(ttp.n_process_1) + SUM(ttp.n_process_2) + SUM(ttp.n_process_3) + SUM(ttp.n_process_4) + SUM(ttp.n_process_5) + SUM(ttp.n_process_6) + SUM(ttp.n_process_7) + SUM(ttp.n_process_8) + SUM(ttp.n_process_9) + SUM(ttp.n_process_10) + SUM(ttp.n_process_14)) AS n_qty
+			FROM 	tv_production_qty_ag AS ttp $sCriteria 
+			GROUP BY ttp.s_buyer, ttp.s_buyer_name, 
+					EXTRACT(YEAR FROM ttp.d_production_date) || '-' || EXTRACT(MONTH FROM ttp.d_production_date), 
+					ttp.d_plan_date, 
+					ttp.d_delivery_date, ttp.d_target_date
+			$sOrderBy $sLimitRows ");
+		
+		return $oQuery->result_array();
+	}
 	
 	function getListModel( $sCriteria='', $nLimit=0, $nOffset=0, $aOrderby=array() ){
 		$sCriteria=($sCriteria!='' ? " WHERE ".$sCriteria : '');

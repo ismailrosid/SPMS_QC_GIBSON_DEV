@@ -39,6 +39,7 @@ class QcGibson extends Controller
         $this->sUploadPath = APPPATH . 'docs/' . date('Ymd') . '/';
         $this->aDivision   = $this->config->item('division');
     }
+
     function masterdefect()
     {
         // Load all defect categories from model
@@ -59,6 +60,97 @@ class QcGibson extends Controller
         $this->parser->parse('footer', $aDisplay);
     }
 
+    function savedefect()
+    {
+        header('Content-Type: application/json');
+
+        // Get input values from POST
+        $categoryCode = trim($this->input->post('category_code', true));
+        $defectCode   = trim($this->input->post('defect_code', true));
+        $defectName   = trim($this->input->post('defect_name', true));
+
+        $errorGroups = array();
+
+        // Validate required fields
+        if (empty($categoryCode)) $errorGroups[] = 'Category must be selected.';
+        if (empty($defectCode))   $errorGroups[] = 'Defect code cannot be empty.';
+        if (empty($defectName))   $errorGroups[] = 'Defect name cannot be empty.';
+
+        if (!empty($errorGroups)) {
+            echo json_encode(array(
+                'status' => 'error',
+                'message' => 'Please correct the following errors:',
+                'errors'  => $errorGroups,
+                'success' => array()
+            ));
+            exit();
+        }
+
+        // Prepare data array for insert/update
+        $aData = array(
+            'category_code' => $categoryCode,
+            'defect_code'   => $defectCode,
+            'defect_name'   => $defectName,
+            // 'created_by'    => $this->sUsername,
+            // 'created_at'    => date('Y-m-d H:i:s')
+        );
+
+        // Start database transaction
+        $this->db->trans_start();
+
+        // Check if defect code already exists
+        $exists = $this->Qc_gibson_model->get_category_defect_by_code($defectCode);
+
+        if ($exists) {
+            $rSave = $this->Qc_gibson_model->update_defect($defectCode, $aData);
+            $action = 'updated';
+        } else {
+            $rSave = $this->Qc_gibson_model->insert_defect($aData);
+            $action = 'saved';
+        }
+
+        if (!$rSave) {
+            $this->db->trans_rollback();
+            echo json_encode(array(
+                'status' => 'error',
+                'message' => 'Failed to ' . $action . ' defect code.',
+                'errors'  => array(),
+                'success' => array()
+            ));
+            exit();
+        }
+
+        // Commit transaction
+        $this->db->trans_complete();
+
+        // Return success response
+        echo json_encode(array(
+            'status'  => 'success',
+            'message' => 'The defect code has been successfully ' . $action . '!',
+            'errors'  => array(),
+            'success' => array($defectCode)
+        ));
+        exit();
+    }
+
+    function scan()
+    {
+        $aDisplay = array(
+            'baseurl'          => base_url(),
+            'basesiteurl'      => site_url(),
+            'siteurl'          => site_url() . '/ag/qcgibson/',
+            'PAGE_TITLE'       => 'SPMS-G. Scan QC Gibson',
+            'sGlobalUserName'  => $this->sUsername,
+            'sGlobalUserLevel' => $this->sLevel,
+        );
+
+        // Parse the header, main view, and footer
+        $this->parser->parse('header', $aDisplay);
+        $this->parser->parse('ag/qcgibson/scan', $aDisplay);
+        $this->parser->parse('footer', $aDisplay);
+    }
+
+   
     function savedefect()
     {
         header('Content-Type: application/json');
@@ -185,53 +277,36 @@ class QcGibson extends Controller
         exit();
     }
 
-
-    function scan()
-    {
-        $aDisplay = array(
-            'baseurl'          => base_url(),
-            'basesiteurl'      => site_url(),
-            'siteurl'          => site_url() . '/ag/qcgibson/',
-            'PAGE_TITLE'       => 'SPMS-G. Scan QC Gibson',
-            'sGlobalUserName'  => $this->sUsername,
-            'sGlobalUserLevel' => $this->sLevel,
-        );
-
-        // Parse the header, main view, and footer
-        $this->parser->parse('header', $aDisplay);
-        $this->parser->parse('ag/qcgibson/scan', $aDisplay);
-        $this->parser->parse('footer', $aDisplay);
-    }
-
-
-    function direct()
-    {
-        $defects = $this->Qc_gibson_model->get_defect();
-        $aDisplay = array(
-            'baseurl'          => base_url(),
-            'basesiteurl'      => site_url(),
-            'siteurl'          => site_url() . '/ag/qcgibson/',
-            'PAGE_TITLE'       => 'SPMS-G. Direct Scan Serial Gibson',
-            'sGlobalUserName'  => $this->sUsername,
-            'sGlobalUserLevel' => $this->sLevel,
-            'defects'          => $defects, // All defects sent to the view
-        );
-
-        $this->parser->parse('header', $aDisplay);
-        $this->parser->parse('ag/qcgibson/direct', $aDisplay);
-        $this->parser->parse('footer', $aDisplay);
-    }
-
     function savedirect()
     {
         header('Content-Type: application/json');
 
         // Get input values from POST
-        $serialNo      = trim($this->input->post('serial_no', true));
-        $defectCode    = trim($this->input->post('defect_code', true));
-        $country       = trim($this->input->post('country', true));
-        $judgmentPost  = trim($this->input->post('judgement', true));
-        $judgment      = ($judgmentPost === "1") ? 'good' : 'nogood';
+        $serialNo   = trim($this->input->post('serial_no', true));
+        $defectCode = trim($this->input->post('defect_code', true));
+        $country    = trim($this->input->post('country', true));
+        $judgmentPost = trim($this->input->post('judgement', true));
+        $judgment = ($judgmentPost === "1") ? 'good' : 'nogood';
+
+        // Frontend double validation in backend
+        
+        if ($judgmentPost === "0" && ($defectCode === "NULL" || empty($defectCode))) {
+            echo json_encode(array(
+                'status' => 'error',
+                'message' => 'If Judgement is NOT PASS, please select a Defect Code.',
+                'errors' => array()
+            ));
+            exit();
+        }
+
+        if ($judgmentPost === "1" && $defectCode !== "NULL" && !empty($defectCode)) {
+            echo json_encode(array(
+                'status' => 'error',
+                'message' => 'You selected a Defect Code. Please change Judgement to NOT PASS.',
+                'errors' => array()
+            ));
+            exit();
+        }
 
         // Validate required field
         if (empty($serialNo)) {
@@ -244,8 +319,8 @@ class QcGibson extends Controller
         }
 
         // Set default values if empty
-        if (empty($judgment))   $judgment = 'good';
-        if (empty($country))    $country = NULL;
+        if (empty($judgment)) $judgment = 'good';
+        if (empty($country))  $country = NULL;
         if (empty($defectCode)) $defectCode = NULL;
 
         // Check if serial number exists in Gibson database
@@ -266,7 +341,7 @@ class QcGibson extends Controller
             'country'     => $country,
             'judgment'    => $judgment,
             'guitar_type' => 'AG', // hardcode AG
-            'uploaded_by' => isset($this->sUsername) ? $this->sUsername : '',
+            'uploaded_by' => $this->sUsername,
             'source'      => 'direct',
             'date'        => date('Y-m-d H:i:s')
         );
@@ -276,52 +351,6 @@ class QcGibson extends Controller
 
         // Insert or update based on existence
         if ($this->Qc_gibson_model->is_exists($serialNo)) {
-
-            // --- COPY EXISTING ROW TO HISTORY FIRST ---
-            $old = $this->Qc_gibson_model->get_tt_by_serial($serialNo);
-
-            if ($old && is_array($old)) {
-                // Map fields from tt to history table (thst_checker_gibson)
-                $aHist = array(
-                    'main_sysid'  => isset($old['sysid']) ? $old['sysid'] : '',
-                    'serial_no'   => isset($old['serial_no']) ? $old['serial_no'] : '',
-                    'date'        => isset($old['date']) ? $old['date'] : '',
-                    'user_scan'   => isset($old['user_scan']) ? $old['user_scan'] : '',
-                    'location'    => isset($old['location']) ? $old['location'] : '',
-                    'judgment'    => isset($old['judgment']) ? $old['judgment'] : '',
-                    'uploaded_at' => isset($old['uploaded_at']) ? $old['uploaded_at'] : '',
-                    'uploaded_by' => isset($old['uploaded_by']) ? $old['uploaded_by'] : '',
-                    'source'      => isset($old['source']) ? $old['source'] : '',
-                    'country'     => isset($old['country']) ? $old['country'] : '',
-                    'defect_code' => isset($old['defect_code']) ? $old['defect_code'] : '',
-                    'guitar_type' => isset($old['guitar_type']) ? $old['guitar_type'] : ''
-                );
-
-                // Use model's insert_history (ke thst_checker_gibson)
-                $rHist = $this->Qc_gibson_model->insert_history($aHist);
-
-                if ($rHist === FALSE) {
-                    // failed to insert history -> rollback and return error
-                    $this->db->trans_rollback();
-                    echo json_encode(array(
-                        'status' => 'error',
-                        'message' => 'Failed to archive previous data before update.',
-                        'errors' => array()
-                    ));
-                    exit();
-                }
-            } else {
-                // couldn't fetch old tt record -> rollback & error
-                $this->db->trans_rollback();
-                echo json_encode(array(
-                    'status' => 'error',
-                    'message' => 'Existing record found but failed to retrieve its current data.',
-                    'errors' => array()
-                ));
-                exit();
-            }
-
-            // After history insert succeed -> continue with update
             $rSave = $this->Qc_gibson_model->update_data($serialNo, $aData);
             $action = 'updated';
         } else {
@@ -350,6 +379,7 @@ class QcGibson extends Controller
         ));
         exit();
     }
+
 
     function doupload()
     {

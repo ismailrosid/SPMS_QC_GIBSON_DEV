@@ -3,7 +3,7 @@
 		<tr class="table_header">
 			<th><a href="#" onClick="_doPost('sSort', 's_location', 'bSortAction')">Location</a></th>
 			<th><a href="#" onClick="_doPost('sSort', 'd_production_date', 'bSortAction')">Month</a></th>
-			<!----
+<!----
 			<th><a href="#" onClick="_doPost('sSort', 'd_plan_date', 'bSortAction')">Production Plan Date (Input)</a></th>
 			<th><a href="#" onClick="_doPost('sSort', 'd_delivery_date', 'bSortAction')">Production Plan Date (Output)</a></th>
 			<th><a href="#" onClick="_doPost('sSort', 'd_target_date', 'bSortAction')">Export Plan Date</a></th>
@@ -11,7 +11,7 @@
 			<th><a href="#" onClick="_doPost('sSort', 's_buyer_name', 'bSortAction')">Buyer</a></th>
 			<th><a href="#" onClick="_doPost('sSort', 's_po_no', 'bSortAction')">PI Number</a></th>
 			<th><a href="#" onClick="_doPost('sSort', 's_po', 'bSortAction')">PO</a></th>
-			<!----
+<!----
 			<th><a href="#" onClick="_doPost('sSort', 's_location', 'bSortAction')">Location</a></th>
 ------>
 			<th width="70px"><a href="#" onClick="_doPost('sSort', 'n_qty', 'bSortAction')">Qty</a></th>
@@ -27,15 +27,14 @@
 			<th width="70px"><a href="#" onClick="_doPost('sSort', 'n_process_10', 'bSortAction')">Packing</a></th>
 			<th width="70px"><a href="#" onClick="_doPost('sSort', 'n_warehouse', 'bSortAction')">Warehouse Incoming</a></th>
 			<th width="70px"><a href="#" onClick="_doPost('sSort', 'n_process_14', 'bSortAction')">Warehouse Outgoing</a></th>
-			<th width="70px"><a href="#" onClick="_doPost('sSort', 's_notes2', 'bSortAction')">Remark</a></th>
+<th width="70px"><a href="#" onClick="_doPost('sSort', 's_notes2', 'bSortAction')">Remark</a></th>
 		</tr>
 	</thead>
 	<tbody>
-		{tt_report_stock}
-		<tr>
-			<td>{s_location}</td>
+	{tt_report_stock}
+		<tr>	<td>{s_location}</td>
 			<td>{d_production_date}</td>
-			<!-----
+<!-----
 			<td>{d_plan_date}</td>
 			<td>{d_delivery_date}</td>
 			<td>{d_target_date}</td>
@@ -43,7 +42,7 @@
 			<td>{s_buyer_name}</td>
 			<td>{s_po_no}</td>
 			<td>{s_po}</td>
-			<!------
+<!------
 			<td>{s_location}</td>
 ------->
 			<td align="right">{n_qty}</td>
@@ -56,19 +55,18 @@
 			<td align="right">{n_process_7}</td>
 			<td align="right">{n_process_8}</td>
 			<td align="right">{n_process_9}</td>
-			<!-- <td align="right">{n_process_10}</td> -->
-			<!-- <td align="right">{n_warehouse}</td> -->
-			<!-- <td align="right">{n_process_14}</td> -->
-			<!-- <td align="right">{s_notes2}</td> -->
+			<td align="right">{n_process_10}</td>
+			<td align="right">{n_warehouse}</td>
+			<td align="right">{n_process_14}</td>
+			<td align="right">{s_notes2}</td>
 		</tr>
-		{/tt_report_stock}
+	{/tt_report_stock}
 	</tbody>
 	<tfoot class="table_footer">
-		{tt_report_stock_total}
-		<tr>
+	{tt_report_stock_total}
+		<tr><td></td>
 			<td></td>
-			<td></td>
-			<!-----
+<!-----
 			<td></td>
 			<td></td>
 			<td></td>
@@ -91,7 +89,7 @@
 			<td align="right">{n_t_process_14}</td>
 			<td align="right">{n_t_remark}</td>
 		</tr>
-		{/tt_report_stock_total}
+	{/tt_report_stock_total}
 	</tfoot>
 </table>
 Total {nTotalRows} rows
@@ -99,10 +97,10 @@ Total {nTotalRows} rows
 	function _onPressEnter(fForm, eEvent) {
 		var nCode;
 		if (!eEvent) var eEvent = window.event;
-		if (eEvent.keyCode)
+		if (eEvent.keyCode) 
 			nCode = eEvent.keyCode;
-		else if (eEvent.which)
+		else if (eEvent.which) 
 			nCode = eEvent.which;
-		if (nCode == 13) fForm.submit();
+		if (nCode==13) fForm.submit();
 	}
 </script>
