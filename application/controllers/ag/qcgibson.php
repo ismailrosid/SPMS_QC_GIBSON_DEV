@@ -101,6 +101,59 @@ class QcGibson extends Controller
         $exists = $this->Qc_gibson_model->get_category_defect_by_code($defectCode);
 
         if ($exists) {
+            // --- INSERT OLD RECORD TO HISTORY FIRST ---
+            // Try to get the full existing defect row (includes sysid)
+            $old = $this->Qc_gibson_model->get_defect($defectCode);
+
+            if ($old && is_array($old)) {
+                // Prepare history array. Table: thst_gibson_defect_code
+                // Columns assumed: main_sysid, defect_code, defect_name, category_code, changed_by, changed_at
+                $aHist = array(
+                    'main_sysid'    => isset($old['sysid']) ? $old['sysid'] : '',
+                    'defect_code'   => isset($old['defect_code']) ? $old['defect_code'] : '',
+                    'defect_name'   => isset($old['defect_name']) ? $old['defect_name'] : '',
+                    'category_code' => isset($old['category_code']) ? $old['category_code'] : '',
+                    // use controller username if available, else empty
+                    'changed_by'    => isset($this->sUsername) ? $this->sUsername : ''
+                );
+
+                // Insert history using same style: set NULL if empty, else set value
+                foreach ($aHist as $sField => $sValue) {
+                    if ($sValue === '') {
+                        $this->db->set($sField, 'NULL', FALSE);
+                    } else {
+                        $this->db->set($sField, $sValue);
+                    }
+                }
+                // set changed_at server time
+                $this->db->set('changed_at', 'NOW()', FALSE);
+
+                $rHist = $this->db->insert('thst_gibson_defect_code');
+
+                if ($rHist === FALSE) {
+                    // failed to insert history -> rollback and return error
+                    $this->db->trans_rollback();
+                    echo json_encode(array(
+                        'status' => 'error',
+                        'message' => 'Failed to archive previous defect data before update.',
+                        'errors'  => array(),
+                        'success' => array()
+                    ));
+                    exit();
+                }
+            } else {
+                // couldn't fetch old defect row (unexpected) -> rollback & error
+                $this->db->trans_rollback();
+                echo json_encode(array(
+                    'status' => 'error',
+                    'message' => 'Existing defect found but failed to retrieve its current data.',
+                    'errors'  => array(),
+                    'success' => array()
+                ));
+                exit();
+            }
+
+            // After history insert succeed -> continue with update
             $rSave = $this->Qc_gibson_model->update_defect($defectCode, $aData);
             $action = 'updated';
         } else {
@@ -131,6 +184,7 @@ class QcGibson extends Controller
         ));
         exit();
     }
+
 
     function scan()
     {
@@ -173,11 +227,11 @@ class QcGibson extends Controller
         header('Content-Type: application/json');
 
         // Get input values from POST
-        $serialNo   = trim($this->input->post('serial_no', true));
-        $defectCode = trim($this->input->post('defect_code', true));
-        $country    = trim($this->input->post('country', true));
-        $judgmentPost = trim($this->input->post('judgement', true));
-        $judgment = ($judgmentPost === "1") ? 'good' : 'nogood';
+        $serialNo      = trim($this->input->post('serial_no', true));
+        $defectCode    = trim($this->input->post('defect_code', true));
+        $country       = trim($this->input->post('country', true));
+        $judgmentPost  = trim($this->input->post('judgement', true));
+        $judgment      = ($judgmentPost === "1") ? 'good' : 'nogood';
 
         // Validate required field
         if (empty($serialNo)) {
@@ -190,8 +244,8 @@ class QcGibson extends Controller
         }
 
         // Set default values if empty
-        if (empty($judgment)) $judgment = 'good';
-        if (empty($country))  $country = NULL;
+        if (empty($judgment))   $judgment = 'good';
+        if (empty($country))    $country = NULL;
         if (empty($defectCode)) $defectCode = NULL;
 
         // Check if serial number exists in Gibson database
@@ -212,7 +266,7 @@ class QcGibson extends Controller
             'country'     => $country,
             'judgment'    => $judgment,
             'guitar_type' => 'AG', // hardcode AG
-            'uploaded_by' => $this->sUsername,
+            'uploaded_by' => isset($this->sUsername) ? $this->sUsername : '',
             'source'      => 'direct',
             'date'        => date('Y-m-d H:i:s')
         );
@@ -222,6 +276,52 @@ class QcGibson extends Controller
 
         // Insert or update based on existence
         if ($this->Qc_gibson_model->is_exists($serialNo)) {
+
+            // --- COPY EXISTING ROW TO HISTORY FIRST ---
+            $old = $this->Qc_gibson_model->get_tt_by_serial($serialNo);
+
+            if ($old && is_array($old)) {
+                // Map fields from tt to history table (thst_checker_gibson)
+                $aHist = array(
+                    'main_sysid'  => isset($old['sysid']) ? $old['sysid'] : '',
+                    'serial_no'   => isset($old['serial_no']) ? $old['serial_no'] : '',
+                    'date'        => isset($old['date']) ? $old['date'] : '',
+                    'user_scan'   => isset($old['user_scan']) ? $old['user_scan'] : '',
+                    'location'    => isset($old['location']) ? $old['location'] : '',
+                    'judgment'    => isset($old['judgment']) ? $old['judgment'] : '',
+                    'uploaded_at' => isset($old['uploaded_at']) ? $old['uploaded_at'] : '',
+                    'uploaded_by' => isset($old['uploaded_by']) ? $old['uploaded_by'] : '',
+                    'source'      => isset($old['source']) ? $old['source'] : '',
+                    'country'     => isset($old['country']) ? $old['country'] : '',
+                    'defect_code' => isset($old['defect_code']) ? $old['defect_code'] : '',
+                    'guitar_type' => isset($old['guitar_type']) ? $old['guitar_type'] : ''
+                );
+
+                // Use model's insert_history (ke thst_checker_gibson)
+                $rHist = $this->Qc_gibson_model->insert_history($aHist);
+
+                if ($rHist === FALSE) {
+                    // failed to insert history -> rollback and return error
+                    $this->db->trans_rollback();
+                    echo json_encode(array(
+                        'status' => 'error',
+                        'message' => 'Failed to archive previous data before update.',
+                        'errors' => array()
+                    ));
+                    exit();
+                }
+            } else {
+                // couldn't fetch old tt record -> rollback & error
+                $this->db->trans_rollback();
+                echo json_encode(array(
+                    'status' => 'error',
+                    'message' => 'Existing record found but failed to retrieve its current data.',
+                    'errors' => array()
+                ));
+                exit();
+            }
+
+            // After history insert succeed -> continue with update
             $rSave = $this->Qc_gibson_model->update_data($serialNo, $aData);
             $action = 'updated';
         } else {
@@ -250,7 +350,6 @@ class QcGibson extends Controller
         ));
         exit();
     }
-
 
     function doupload()
     {

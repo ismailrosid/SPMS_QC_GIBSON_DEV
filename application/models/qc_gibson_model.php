@@ -19,6 +19,18 @@ class Qc_gibson_model extends Model
     }
 
     /**
+     * Get single row from tt_checker_gibson by serial_no
+     */
+    function get_tt_by_serial($sSerialNo)
+    {
+        $this->db->select('*');
+        $this->db->from('tt_checker_gibson');
+        $this->db->where('serial_no', strtoupper(trim($sSerialNo)));
+        $query = $this->db->get();
+        return $query->row_array(); // returns assoc array or NULL
+    }
+
+    /**
      * Insert new data into tt_checker_gibson
      */
     function insert_data($aData)
@@ -39,6 +51,33 @@ class Qc_gibson_model extends Model
         $rInsert = $this->db->insert('tt_checker_gibson');
         return $rInsert !== FALSE;
     }
+
+    /**
+     * Insert new history data into thst_checker_gibson
+     */
+    function insert_history($aData)
+    {
+        foreach ($aData as $sField => $sValue) {
+            if ($sValue === '') {
+                $this->db->set($sField, 'NULL', FALSE); // Set NULL if empty
+            } else {
+                $this->db->set($sField, $sValue);
+            }
+        }
+
+        // Normalize serial_no if provided
+        if (isset($aData['serial_no'])) {
+            $this->db->set('serial_no', strtoupper(trim($aData['serial_no'])));
+        }
+
+        // Update timestamp auto
+        $this->db->set('uploaded_at', 'NOW()', FALSE);
+
+        // Insert into history table
+        $rInsert = $this->db->insert('thst_checker_gibson');
+        return $rInsert !== FALSE;
+    }
+
 
     /**
      * Update existing data for a specific serial number

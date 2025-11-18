@@ -213,7 +213,6 @@
     }
 </style>
 
-
 <div class="card-form">
     <div class="card-form-section">
         <div class="card-form-section-header"><span>Add Defect Code</span></div>
